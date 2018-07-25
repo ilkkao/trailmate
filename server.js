@@ -8,15 +8,15 @@ const logger = require('koa-logger');
 const app = new Koa();
 const router = new Router();
 
-app.use(koaBody());
 app.use(logger());
 
 router.get('/', ctx => {
   ctx.body = 'Tulossa pian...';
 });
 
-router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, ctx => {
-  console.log(JSON.stringify(ctx.request.body));
+router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), ctx => {
+  console.log(ctx.request.body);
+  console.log(ctx.request.files);
   ctx.response.status = 200;
 });
 
