@@ -14,10 +14,17 @@ router.get('/', ctx => {
   ctx.body = 'Tulossa pian...';
 });
 
-router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), ctx => {
-  console.log(ctx.request.body);
-  console.log(ctx.request.files);
-  ctx.response.status = 200;
+router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), ({ request, response }) => {
+  if (request['attachment-count'] === 1) {
+    const date = request.Data;
+    const file = request.files['attachment-1'];
+
+    console.log({ date, file });
+  } else {
+    console.error('Unexpected amount of attachments in the email.');
+  }
+
+  response.status = 200;
 });
 
 app.use(router.routes()).use(router.allowedMethods());
