@@ -16,7 +16,7 @@ router.get('/', ctx => {
 
 router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), ({ request, response }) => {
   if (request.body['attachment-count'] === '1') {
-    const date = request.body.Data;
+    const date = request.body.Date;
     const file = request.files['attachment-1'];
 
     console.log({ date, file });
