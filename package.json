@@ -1,0 +1,27 @@
+{
+  "name": "riistaweb",
+  "version": "1.0.0",
+  "description": "Trail cam website",
+  "main": "index.js",
+  "repository": "https://github.com/ilkkao/riistaweb",
+  "author": "Ilkka Oksanen <iao@iki.fi>",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^4.1.4",
+    "dotenv": "^6.0.0",
+    "koa": "^2.5.2",
+    "koa-body": "^4.0.4",
+    "koa-logger": "^3.2.0",
+    "koa-router": "^7.4.0",
+    "koa-send": "^5.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "eslint": "4",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-prettier": "^2.6.2",
+    "prettier": "^1.13.7"
+  }
+}
