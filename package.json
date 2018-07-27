@@ -13,10 +13,12 @@
     "koa-body": "^4.0.4",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
-    "koa-send": "^5.0.0"
+    "koa-send": "^5.0.0",
+    "sharp": "^0.20.5",
+    "tesseract.js": "^1.0.10",
+    "uid2": "^0.0.3"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.6",
     "eslint": "4",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-config-prettier": "^2.9.0",
