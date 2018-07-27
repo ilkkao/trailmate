@@ -2,9 +2,7 @@ module.exports = {
   extends: [
     'airbnb-base',
     'prettier'
-  ],
-  parser: 'babel-eslint',
-  rules: {
+  ],  rules: {
     'prettier/prettier': [
       'error', {
         singleQuote: true
