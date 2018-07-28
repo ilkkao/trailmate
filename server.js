@@ -92,6 +92,7 @@ async function processNewImage(dateString, filePath) {
 
   console.log('OCR reading the metadata region');
   const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
+
   // TODO: Delete temp file
 
   console.log('Creating a database entry');
