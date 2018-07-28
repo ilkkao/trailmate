@@ -162,7 +162,7 @@ async function ocrMetaDataImage(metaDataImage) {
         }
 
         try {
-          const [, temperature] = text.match(/(-?\d+)°C/);
+          const [, temperature] = text.match(/(-?\d+)°/);
           ocrTemperature = parseInt(temperature)
         } catch {
           console.warn('OCR temperature parsing failed');
