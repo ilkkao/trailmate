@@ -99,7 +99,7 @@ async function processNewImage(dateString, filePath) {
   insertStmt.run({
     file_name: baseFileName,
     email_created_at: emailCreatedAtDate.getTime() / 1000,
-    ocr_created_at: ocrDate.getTime() / 1000,
+    ocr_created_at: ocrDate && ocrDate.getTime() / 1000,
     temperature: ocrTemperature,
     created_at: Math.floor(Date.now() / 1000)
   });
