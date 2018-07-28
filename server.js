@@ -65,7 +65,7 @@ async function init() {
   app.use(logger());
 
   app.use(hbs.middleware({
-    viewPath: __dirname + '/views'
+    viewPath: path.join(__dirname, '/views')
   }));
 
   router.get('/', async ctx => {
@@ -78,7 +78,7 @@ async function init() {
 
   app.use(router.routes()).use(router.allowedMethods());
 
-  app.use(staticServer('data'));
+  app.use(staticServer(process.env.IMAGE_DIR));
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);
