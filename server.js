@@ -146,6 +146,8 @@ async function ocrMetaDataImage(metaDataImage) {
         let ocrDate = null;
         let ocrTemperature = null;
 
+        console.log(`OCR string: ${text}`);
+
         try {
           const [, day, month, year] = text.match(/(\d\d)\/(\d\d)\/(\d\d\d\d)/);
           const [, hours, minutes, seconds] = text.match(/(\d\d):(\d\d):(\d\d)/);
