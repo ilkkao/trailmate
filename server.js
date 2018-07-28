@@ -78,18 +78,43 @@ async function processNewImageRequest({ request, response }) {
 }
 
 async function processNewImage(dateString, filePath) {
-  const baseFileName = await saveMainImage(filePath);
+  const { baseFileName, fileName, thumbnailFileName } = buildFileName();
+  const emailCreatedAtDate = new Date(dateString);
+
+  console.log('Saving the main image');
+  await saveMainImage(filePath, fileName);
+
+  console.log('Saving the thumbnail image');
+  await saveThumbnailImage(filePath, thumbnailFileName);
+
+  console.log('Extracting the metadata region');
   const metaDataImage = await extractMetaDataImage(filePath);
+
+  console.log('OCR reading the metadata region');
   const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
   // TODO: Delete temp file
 
+  console.log('Creating a database entry');
   insertStmt.run({
     file_name: baseFileName,
-    email_created_at: (new Date(dateString)).getTime() / 1000,
+    email_created_at: emailCreatedAtDate.getTime() / 1000,
     ocr_created_at: ocrDate.getTime() / 1000,
     temperature: ocrTemperature,
     created_at: Math.floor(Date.now() / 1000)
   });
+
+  console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
+  console.log('Image processed succesfully');
+}
+
+function buildFileName() {
+  const baseFileName = uuid(42);
+
+  return {
+    baseFileName,
+    fileName: `${baseFileName}.jpg`,
+    thumbnailFileName: `${baseFileName}_thumb.jpg`
+  };
 }
 
 async function extractMetaDataImage(filePath) {
@@ -99,23 +124,17 @@ async function extractMetaDataImage(filePath) {
     .then(({ data }) => data);
 }
 
-async function saveMainImage(filePath) {
-  const baseFileName = uuid(42);
-  const fileName = `${baseFileName}.jpg`;
-  const thumbnailFileName = `${baseFileName}_thumb.jpg`;
-
+async function saveMainImage(filePath, fileName) {
   return sharp(filePath)
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
     .toFile(path.join(process.env.IMAGE_DIR, fileName))
-    .then(() => {
-      sharp(filePath)
-        .extract({ left: 0, top: 0, width: 1279, height: 928 })
-        .resize(200)
-        .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName))
+}
 
-      return baseFileName;
-    });
-
+async function saveThumbnailImage(filePath, thumbnailFileName) {
+  return sharp(filePath)
+    .extract({ left: 0, top: 0, width: 1279, height: 928 })
+    .resize(200)
+    .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName))
 }
 
 async function ocrMetaDataImage(metaDataImage) {
