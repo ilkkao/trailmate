@@ -157,12 +157,16 @@ async function ocrMetaDataImage(metaDataImage) {
 
           ocrDate = new Date(Date.UTC(...dateParts));
           ocrDate.setHours(ocrDate.getHours() - parseInt(process.env.CAMERA_TZ_OFFSET));
-        } catch {}
+        } catch {
+          console.warn('OCR date parsing failed');
+        }
 
         try {
           const [, temperature] = text.match(/(-?\d+)°C/);
           ocrTemperature = parseInt(temperature)
-        } catch {}
+        } catch {
+          console.warn('OCR temperature parsing failed');
+        }
 
         return resolve({ ocrDate, ocrTemperature });
       });
