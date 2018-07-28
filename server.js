@@ -151,14 +151,16 @@ async function ocrMetaDataImage(metaDataImage) {
         try {
           const [, day, month, year] = text.match(/(\d\d)\/(\d\d)\/(\d\d\d\d)/);
           const [, hours, minutes, seconds] = text.match(/(\d\d):(\d\d):(\d\d)/);
-          const [, temperature] = text.match(/(-?\d+)°C/);
 
           let dateParts = [year, month, day, hours, minutes, seconds].map(part => parseInt(part));
           dateParts[1] = dateParts[1] - 1; // The argument monthIndex is 0-based
 
           ocrDate = new Date(Date.UTC(...dateParts));
           ocrDate.setHours(ocrDate.getHours() - parseInt(process.env.CAMERA_TZ_OFFSET));
+        } catch {}
 
+        try {
+          const [, temperature] = text.match(/(-?\d+)°C/);
           ocrTemperature = parseInt(temperature)
         } catch {}
 
