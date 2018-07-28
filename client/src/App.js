@@ -11,9 +11,13 @@ class App extends Component {
     this.state = {
       images: []
     };
+
+    this.updateImages();
+
+    setInterval(this.updateImages.bind(this), 10000);
   }
 
-  async componentDidMount() {
+  async updateImages() {
     const res = await fetch('/api/images.json');
     const images = await res.json();
 
@@ -31,7 +35,7 @@ class App extends Component {
       const timeString = format(firstEmailCreatedAt, 'HH:mm')
       const duration = distanceInWords(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
 
-      const tags = differenceInHours(new Date(), firstEmailCreatedAt) < 24 ? [{ title: "Uusi kuva", value: "UUSI, alle 24h" }] : undefined;
+      const tags = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? [{ title: "Uusi kuva", value: "UUSI, alle 24h" }] : undefined;
 
       return (
         <div className="activity">
