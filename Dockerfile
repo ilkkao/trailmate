@@ -13,7 +13,7 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 RUN yarn install --production
 
-COPY .env server.js /app/server/
+COPY server.js eng.traineddata /app/server/
 
 EXPOSE 3000
 CMD [ "node", "server.js" ]
