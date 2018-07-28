@@ -5,6 +5,8 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 const logger = require('koa-logger');
+const hbs = require('koa-hbs');
+const staticServer = require('koa-static');
 const sharp = require('sharp');
 const Tesseract = require('tesseract.js');
 const uuid = require('uid2');
@@ -42,6 +44,16 @@ const insertStmt = db.prepare(`
     $temperature
   )`);
 
+const queryStml = db.prepare(`
+  SELECT
+    file_name, datetime(email_created_at,'unixepoch') AS email_created_at, ocr_created_at, temperature
+  FROM
+    images
+  WHERE
+    deleted_at IS NULL
+  ORDER BY
+    email_created_at DESC`);
+
 init();
 
 process.on('exit', () => Tesseract.terminate());
@@ -52,13 +64,21 @@ async function init() {
 
   app.use(logger());
 
-  router.get('/', ctx => {
-    ctx.body = 'Coming soon...';
+  app.use(hbs.middleware({
+    viewPath: __dirname + '/views'
+  }));
+
+  router.get('/', async ctx => {
+    await ctx.render('main', {
+      images: queryStml.all()
+    });
   });
 
   router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
 
   app.use(router.routes()).use(router.allowedMethods());
+
+  app.use(staticServer('data'));
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Riistakamera Parkano </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <h1>Riistakamera Parkano</h1>
+
+  {{#each images}}
+  <p>
+    <a href="/{{file_name}}.jpg">
+      <img src="/{{file_name}}_thumb.jpg">
+    </a>
+    <li>Date: {{email_created_at}} Temp: {{temperature}}°C</li>
+    <!-- <li>{{ocr_created_at}}</li> -->
+  </p>
+  {{/each}}
+  </p>
+</body>
+
+</html>
