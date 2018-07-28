@@ -13,6 +13,13 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 RUN yarn install --production
 
+COPY client /app/server/client
+
+RUN cd client && \
+  yarn install && \
+  yarn build && \
+  rm -fr node_modules
+
 COPY server.js eng.traineddata /app/server/
 
 EXPOSE 3000
