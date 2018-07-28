@@ -5,14 +5,16 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 const logger = require('koa-logger');
-const hbs = require('koa-hbs');
 const staticServer = require('koa-static');
+const mount = require('koa-mount');
 const sharp = require('sharp');
 const Tesseract = require('tesseract.js');
 const uuid = require('uid2');
 const Database = require('better-sqlite3');
 
 const db = new Database(process.env.DB_FILE);
+
+const GROUPING_THRESHOLD = 60 * 10; // 10 minutes
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS images (
@@ -46,13 +48,13 @@ const insertStmt = db.prepare(`
 
 const queryStml = db.prepare(`
   SELECT
-    file_name, datetime(email_created_at,'unixepoch') AS email_created_at, ocr_created_at, temperature
+    file_name, email_created_at, ocr_created_at, temperature
   FROM
     images
   WHERE
     deleted_at IS NULL
   ORDER BY
-    email_created_at DESC`);
+    email_created_at ASC`);
 
 init();
 
@@ -64,24 +66,38 @@ async function init() {
 
   app.use(logger());
 
-  app.use(hbs.middleware({
-    viewPath: path.join(__dirname, '/views')
-  }));
-
-  router.get('/', async ctx => {
-    await ctx.render('main', {
-      images: queryStml.all()
-    });
-  });
-
-  router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
+  router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
+  router.get('/api/images.json', listImages)
 
   app.use(router.routes()).use(router.allowedMethods());
 
-  app.use(staticServer(process.env.IMAGE_DIR));
+  app.use(mount('/camera-images', staticServer(process.env.IMAGE_DIR, {
+    maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
+  })));
+
+  app.use(staticServer(path.join(__dirname, 'client/build')));
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);
+}
+
+async function listImages({ request, response}) {
+  const images = [];
+  let previousImageTs = 0;
+
+  queryStml.all().forEach(image => {
+    const currentImageTs = image.email_created_at;
+
+    if (currentImageTs - previousImageTs > GROUPING_THRESHOLD) {
+      images.push([]);
+    }
+
+    images[images.length - 1].push(image);
+
+    previousImageTs = image.email_created_at;
+  });
+
+  response.body = images.reverse();
 }
 
 async function processNewImageRequest({ request, response }) {
@@ -98,14 +114,14 @@ async function processNewImageRequest({ request, response }) {
 }
 
 async function processNewImage(dateString, filePath) {
-  const { baseFileName, fileName, thumbnailFileName } = buildFileName();
+  const baseFileName = uuid(42);
   const emailCreatedAtDate = new Date(dateString);
 
   console.log('Saving the main image');
-  await saveMainImage(filePath, fileName);
+  await saveMainImage(filePath, `${baseFileName}.jpg`);
 
-  console.log('Saving the thumbnail image');
-  await saveThumbnailImage(filePath, thumbnailFileName);
+  console.log('Saving the 1x thumbnail image');
+  await saveThumbnailImage(filePath, 170, `${baseFileName}_thumb.jpg`);
 
   console.log('Extracting the metadata region');
   const metaDataImage = await extractMetaDataImage(filePath);
@@ -128,16 +144,6 @@ async function processNewImage(dateString, filePath) {
   console.log('Image processed succesfully');
 }
 
-function buildFileName() {
-  const baseFileName = uuid(42);
-
-  return {
-    baseFileName,
-    fileName: `${baseFileName}.jpg`,
-    thumbnailFileName: `${baseFileName}_thumb.jpg`
-  };
-}
-
 async function extractMetaDataImage(filePath) {
   return sharp(filePath)
     .extract({ left: 520, top: 932, width: 565, height: 26 })
@@ -151,10 +157,10 @@ async function saveMainImage(filePath, fileName) {
     .toFile(path.join(process.env.IMAGE_DIR, fileName))
 }
 
-async function saveThumbnailImage(filePath, thumbnailFileName) {
+async function saveThumbnailImage(filePath, width, thumbnailFileName) {
   return sharp(filePath)
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
-    .resize(200)
+    .resize(width)
     .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName))
 }
 
