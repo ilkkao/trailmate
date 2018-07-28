@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Gallery from 'react-grid-gallery';
-import { distanceInWords, format } from 'date-fns'
+import { distanceInWords, differenceInHours, format } from 'date-fns'
 import fi from 'date-fns/locale/fi';
 import './App.css';
 
@@ -31,6 +31,8 @@ class App extends Component {
       const timeString = format(firstEmailCreatedAt, 'HH:mm')
       const duration = distanceInWords(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
 
+      const tags = differenceInHours(new Date(), firstEmailCreatedAt) < 24 ? [{ title: "Uusi kuva", value: "UUSI, alle 24h" }] : undefined;
+
       return (
         <div className="activity">
           <div className="activity-title">Aktiviteetti {images.length - index}:</div>
@@ -41,7 +43,7 @@ class App extends Component {
             thumbnailWidth: 170,
             thumbnailHeight: 145,
             margin: 1,
-            tags: [{ title: "Uusi kuva", value: "UUSI, alle 24h" }],
+            tags,
             caption: `${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello  HH:mm', { locale: fi })}, lämpötila: ${image.temperature}°C`
           }))} />
         </div>
