@@ -15,10 +15,12 @@ class App extends Component {
     this.updateImages = this.updateImages.bind(this);
 
     this.state = {
-      images: []
+      images: window.preloadedImages || []
     };
 
-    this.updateImages();
+    if (!window.preloadedImages) {
+      this.updateImages();
+    }
 
     setInterval(this.updateImages, 10000);
   }
