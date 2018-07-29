@@ -15,7 +15,7 @@ const Database = require('better-sqlite3');
 
 const db = new Database(process.env.DB_FILE);
 
-const GROUPING_THRESHOLD = 60 * 10; // 10 minutes
+const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
 
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
