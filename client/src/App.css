@@ -24,13 +24,14 @@
 
 .info {
   padding: 1rem 2rem;
+  text-align: center;
 }
 
 .activity {
   padding: 1rem 1rem 2rem 1rem;
   margin: 1rem 0;
   width: 90%;
-  max-width: 640px;
+  max-width: 740px;
   box-sizing: border-box;
   min-height: 1px;
   background: #edf3eb;
