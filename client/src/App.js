@@ -55,13 +55,13 @@ class App extends Component {
       const duration = distanceInWords(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
 
       const newTag = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24
-        ? <span className="activity-new">Uusi, alle 24h</span>
+        ? <span className="activity-new">UUSI - ALLE 24H</span>
         : null;
 
       return (
         <div className="activity">
           <img src={camera} className="camera-icon" alt="[camera]" />
-          <div className="activity-title">#{images.length - index} {newTag}</div>
+          <span className="activity-title">#{images.length - index} {newTag}</span>
           <div className="activity-description">Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.</div>
           <Gallery
             margin={1}

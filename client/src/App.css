@@ -28,7 +28,7 @@
 }
 
 .activity {
-  padding: 1rem 1rem 2rem 1rem;
+  padding: 2rem;
   margin: 1rem 0;
   width: 90%;
   max-width: 740px;
@@ -43,17 +43,16 @@
 }
 
 .camera-icon {
+  display: inline-block;
   height: 24px;
-  position: absolute;
-  top: 12px;
-  left: 18px;
+  position: relative;
   margin-right: 10px;
 }
 
 .activity-title {
-  position: absolute;
-  top: 13px;
-  left: 48px;
+  position: relative;
+  top: -4px;
+  left: -6px;
   font-size: 20px;
   font-weight: 700;
   padding-bottom: 0.2rem;
@@ -63,19 +62,18 @@
 .activity-description {
   font-size: 14px;
   font-weight: 400;
-  padding-top: 24px;
-  padding-bottom: 1rem;
+  padding-bottom: 1.5rem;
 }
 
 .activity-new {
   position: relative;
-  top: -3px;
+  top: -4px;
   background-color: #315bb9;
   color: white;
   border-radius: 3px;
-  padding: 3px 10px;
+  padding: 3px 6px;
   margin: 0 10px;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .footer {
