@@ -50,7 +50,6 @@ class App extends Component {
             rowHeight={145}
             imageCountSeparator=" / "
             backdropClosesModal={true}
-            customControls={[admin]}
             lightboxWillOpen={(a) => alert(a)}
             images={eventImages.map(image => ({
               src: `/camera-images/${image.file_name}.jpg`,
