@@ -41,15 +41,22 @@ class App extends Component {
         <div className="activity">
           <div className="activity-title">Aktiviteetti {images.length - index}:</div>
           <div className="activity-description">{dateString} sitten, alkoi {timeString}, pituus {duration}</div>
-          <Gallery enableImageSelection={false} margin={1} showLightboxThumbnails={true} rowHeight={145} imageCountSeparator=" / " images={eventImages.map(image => ({
-            src: `/camera-images/${image.file_name}.jpg`,
-            thumbnail: `/camera-images/${image.file_name}_thumb.jpg`,
-            thumbnailWidth: 170,
-            thumbnailHeight: 145,
-            margin: 1,
-            tags,
-            caption: `${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello  HH:mm', { locale: fi })}, lämpötila: ${image.temperature}°C`
-          }))} />
+          <Gallery
+            enableImageSelection={false}
+            margin={1}
+            showLightboxThumbnails={true}
+            rowHeight={145}
+            imageCountSeparator=" / "
+            backdropClosesModal={true}
+            images={eventImages.map(image => ({
+              src: `/camera-images/${image.file_name}.jpg`,
+              thumbnail: `/camera-images/${image.file_name}_thumb.jpg`,
+              thumbnailWidth: 170,
+              thumbnailHeight: 145,
+              margin: 1,
+              tags,
+              caption: `${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello  HH:mm', { locale: fi })}, lämpötila: ${image.temperature}°C`
+            }))} />
         </div>
       )
     });
