@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "date-fns": "^1.29.0",
+    "qs": "^6.5.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-grid-gallery": "^0.5.1",

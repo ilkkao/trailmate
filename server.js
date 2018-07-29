@@ -60,6 +60,14 @@ const queryStml = db.prepare(`
   ORDER BY
     email_created_at ASC`);
 
+const deleteStml = db.prepare(`
+  UPDATE
+    images
+  SET
+    deleted_at=$deleted_at
+  WHERE
+    file_name=$file_name`);
+
 init();
 
 process.on('exit', () => Tesseract.terminate());
@@ -72,6 +80,7 @@ async function init() {
 
   router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
   router.get('/api/images.json', listImages);
+  router.delete('/api/delete_image/:image_id/:password', deleteImage);
 
   app.use(router.routes()).use(router.allowedMethods());
 
@@ -107,6 +116,21 @@ async function listImages({ response }) {
   });
 
   response.body = images.reverse();
+}
+
+async function deleteImage({ response, params }) {
+  console.log(params.password, process.env.ADMIN_PASSWORD);
+
+  if (params.password === process.env.ADMIN_PASSWORD) {
+    const info = deleteStml.run({
+      file_name: params.image_id,
+      deleted_at: Math.floor(Date.now() / 1000)
+    });
+
+    console.log({ info });
+  }
+
+  response.status = 200;
 }
 
 async function processNewImageRequest({ request, response }) {
