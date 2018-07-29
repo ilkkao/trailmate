@@ -3,6 +3,8 @@ import Gallery from 'react-grid-gallery';
 import { distanceInWords, differenceInHours, format } from 'date-fns'
 import fi from 'date-fns/locale/fi';
 import qs from 'qs';
+import logo from './moose-shape.svg';
+import camera from './photo-camera.svg';
 import './App.css';
 
 class App extends Component {
@@ -56,7 +58,8 @@ class App extends Component {
 
       return (
         <div className="activity">
-          <div className="activity-title">{newTag}Aktiviteetti #{images.length - index}</div>
+          <img src={camera} className="camera-icon" alt="[camera]" />
+          <div className="activity-title">#{images.length - index} {newTag}</div>
           <div className="activity-description">Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.</div>
           <Gallery
             margin={1}
@@ -81,9 +84,12 @@ class App extends Component {
 
     return (
       <div className="main-container" >
-        <div className="title">Riistakamera Parkano</div>
+        <div className="title"><img src={logo} className="logo" alt="logo" />Riistakamera Parkano</div>
         <div className="info">Trailcam</div>
         {boxes}
+        <div className="footer">
+          Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> are licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a> Kuvat: &copy; 2018 Ilkka ja Oiva Oksanen.
+        </div>
       </div>
     );
   }
