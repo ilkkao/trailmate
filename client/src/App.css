@@ -1,5 +1,5 @@
 .main-container {
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -10,18 +10,23 @@
 }
 
 .title {
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 600;
+  padding: 1rem 0;
+}
+
+.info {
+  padding: 1rem 0.5rem;
 }
 
 .activity {
-  padding: 2rem 2rem 3rem 2rem;
+  padding: 1rem 1rem 2rem 1rem;
   margin: 1rem 0;
   width: 90%;
-  max-width: 90%;
+  max-width: 640px;
   box-sizing: border-box;
   min-height: 1px;
-  background: #fff;
+  background: #e7f1e4;
   border-radius: 2px;
   margin: 1rem;
   position: relative;
@@ -30,12 +35,24 @@
 }
 
 .activity-title {
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 700;
+  padding-bottom: 0.5rem;
 }
 
 .activity-description {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 400;
-  padding-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.activity-new {
+  position: relative;
+  top: -3px;
+  background-color: #ec1450;
+  color: white;
+  border-radius: 3px;
+  padding: 3px 10px;
+  margin: 0 10px;
+  font-size: 12px;
 }

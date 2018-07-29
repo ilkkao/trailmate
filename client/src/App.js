@@ -35,12 +35,14 @@ class App extends Component {
       const timeString = format(firstEmailCreatedAt, 'HH:mm')
       const duration = distanceInWords(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
 
-      const tags = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? [{ title: "Uusi kuva", value: "UUSI, alle 24h" }] : undefined;
+      const newTag = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24
+        ? <span className="activity-new">Uusi, alle 24h</span>
+        : null;
 
       return (
         <div className="activity">
-          <div className="activity-title">Aktiviteetti {images.length - index}:</div>
-          <div className="activity-description">{dateString} sitten, alkoi {timeString}, pituus {duration}</div>
+          <div className="activity-title">{newTag}Aktiviteetti #{images.length - index}</div>
+          <div className="activity-description">Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.</div>
           <Gallery
             enableImageSelection={false}
             margin={1}
@@ -48,13 +50,14 @@ class App extends Component {
             rowHeight={145}
             imageCountSeparator=" / "
             backdropClosesModal={true}
+            customControls={[admin]}
+            lightboxWillOpen={(a) => alert(a)}
             images={eventImages.map(image => ({
               src: `/camera-images/${image.file_name}.jpg`,
               thumbnail: `/camera-images/${image.file_name}_thumb.jpg`,
               thumbnailWidth: 170,
               thumbnailHeight: 145,
               margin: 1,
-              tags,
               caption: `${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello  HH:mm', { locale: fi })}, lämpötila: ${image.temperature}°C`
             }))} />
         </div>
@@ -64,6 +67,7 @@ class App extends Component {
     return (
       <div className="main-container" >
         <div className="title">Riistakamera Parkano</div>
+        <div className="info">Trailcam</div>
         {boxes}
       </div>
     );

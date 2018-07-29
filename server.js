@@ -16,7 +16,8 @@ const db = new Database(process.env.DB_FILE);
 
 const GROUPING_THRESHOLD = 60 * 10; // 10 minutes
 
-db.prepare(`
+db.prepare(
+  `
   CREATE TABLE IF NOT EXISTS images (
     id integer PRIMARY KEY AUTOINCREMENT,
     file_name text NOT NULL UNIQUE,
@@ -24,12 +25,15 @@ db.prepare(`
     email_created_at integer NOT NULL,
     ocr_created_at integer,
     temperature integer,
-    deleted_at integer)`).run();
+    deleted_at integer)`
+).run();
 
-db.prepare(`
+db.prepare(
+  `
   CREATE UNIQUE INDEX IF NOT EXISTS idx_images_email_created_at ON images (
     email_created_at
-  )`).run();
+  )`
+).run();
 
 const insertStmt = db.prepare(`
   INSERT INTO images (
@@ -67,13 +71,18 @@ async function init() {
   app.use(logger());
 
   router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
-  router.get('/api/images.json', listImages)
+  router.get('/api/images.json', listImages);
 
   app.use(router.routes()).use(router.allowedMethods());
 
-  app.use(mount('/camera-images', staticServer(process.env.IMAGE_DIR, {
-    maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
-  })));
+  app.use(
+    mount(
+      '/camera-images',
+      staticServer(process.env.IMAGE_DIR, {
+        maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
+      })
+    )
+  );
 
   app.use(staticServer(path.join(__dirname, 'client/build')));
 
@@ -81,7 +90,7 @@ async function init() {
   app.listen(process.env.SERVER_PORT);
 }
 
-async function listImages({ request, response}) {
+async function listImages({ response }) {
   const images = [];
   let previousImageTs = 0;
 
@@ -154,14 +163,14 @@ async function extractMetaDataImage(filePath) {
 async function saveMainImage(filePath, fileName) {
   return sharp(filePath)
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
-    .toFile(path.join(process.env.IMAGE_DIR, fileName))
+    .toFile(path.join(process.env.IMAGE_DIR, fileName));
 }
 
 async function saveThumbnailImage(filePath, width, thumbnailFileName) {
   return sharp(filePath)
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
     .resize(width)
-    .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName))
+    .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName));
 }
 
 async function ocrMetaDataImage(metaDataImage) {
@@ -178,19 +187,19 @@ async function ocrMetaDataImage(metaDataImage) {
           const [, day, month, year] = text.match(/(\d\d)\/(\d\d)\/(\d\d\d\d)/);
           const [, hours, minutes, seconds] = text.match(/(\d\d):(\d\d):(\d\d)/);
 
-          let dateParts = [year, month, day, hours, minutes, seconds].map(part => parseInt(part));
-          dateParts[1] = dateParts[1] - 1; // The argument monthIndex is 0-based
+          const dateParts = [year, month, day, hours, minutes, seconds].map(part => parseInt(part));
+          dateParts[1] -= 1; // The argument monthIndex is 0-based
 
           ocrDate = new Date(Date.UTC(...dateParts));
           ocrDate.setHours(ocrDate.getHours() - parseInt(process.env.CAMERA_TZ_OFFSET));
-        } catch {
+        } catch (e) {
           console.warn('OCR date parsing failed');
         }
 
         try {
           const [, temperature] = text.match(/(-?\d+)°/);
-          ocrTemperature = parseInt(temperature)
-        } catch {
+          ocrTemperature = parseInt(temperature);
+        } catch (e) {
           console.warn('OCR temperature parsing failed');
         }
 
