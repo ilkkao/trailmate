@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -15,6 +16,8 @@ const Database = require('better-sqlite3');
 const db = new Database(process.env.DB_FILE);
 
 const GROUPING_THRESHOLD = 60 * 10; // 10 minutes
+
+const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
 db.prepare(
   `
@@ -93,13 +96,25 @@ async function init() {
     )
   );
 
+  router.get('/', renderIndex);
+
   app.use(staticServer(path.join(__dirname, 'client/build')));
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);
 }
 
+async function renderIndex({ response }) {
+  const images = imageList();
+
+  response.body = indexPage.replace('!!!image_data!!!', JSON.stringify(images));
+}
+
 async function listImages({ response }) {
+  response.body = imageList();
+}
+
+function imageList() {
   const images = [];
   let previousImageTs = 0;
 
@@ -115,7 +130,7 @@ async function listImages({ response }) {
     previousImageTs = image.email_created_at;
   });
 
-  response.body = images.reverse();
+  return images.reverse();
 }
 
 async function deleteImage({ response, params }) {
