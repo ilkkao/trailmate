@@ -97,8 +97,13 @@ async function init() {
   );
 
   router.get('/', renderIndex);
+  router.get('/index.html', renderIndex);
 
-  app.use(staticServer(path.join(__dirname, 'client/build')));
+  app.use(
+    staticServer(path.join(__dirname, 'client/build'), {
+      maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
+    })
+  );
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);
