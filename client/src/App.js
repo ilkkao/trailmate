@@ -85,11 +85,13 @@ class App extends Component {
     });
 
     return (
-      <div className="main-container" >
-        <div className="title"><img src={logo} className="logo" alt="logo" />Riistakamera Parkano</div>
-        <div className="info">Trailcam</div>
+      <div className="main-container">
+        <header>
+          <div className="title"><img src={logo} className="logo" alt="logo" />Riistakamera Parkano</div>
+          <div className="info">Trailcam</div>
+        </header>
         {boxes}
-        <div className="footer">
+        <footer className="footer">
           Icons made by
           <a href="http://www.freepik.com" rel="noopener" title="Freepik">Freepik</a>
           from
@@ -97,7 +99,7 @@ class App extends Component {
           are licensed by
           <a href="http://creativecommons.org/licenses/by/3.0/" rel="noopener" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
           Kuvat: &copy; 2018 Ilkka ja Oiva Oksanen.
-        </div>
+        </footer>
       </div>
     );
   }
