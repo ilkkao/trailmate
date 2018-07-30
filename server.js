@@ -3,11 +3,10 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
+const send = require('koa-send');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 const logger = require('koa-logger');
-const staticServer = require('koa-static');
-const mount = require('koa-mount');
 const sharp = require('sharp');
 const Tesseract = require('tesseract.js');
 const uuid = require('uid2');
@@ -16,6 +15,7 @@ const Database = require('better-sqlite3');
 const db = new Database(process.env.DB_FILE);
 
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
+const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
@@ -84,35 +84,46 @@ async function init() {
   router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
   router.get('/api/images.json', listImages);
   router.delete('/api/delete_image/:image_id/:password', deleteImage);
+  router.get(/^\/camera-images\/(.*)/, serveCameraImage);
+  router.get(/(.*)/, renderAsset);
 
-  app.use(router.routes()).use(router.allowedMethods());
-
-  app.use(
-    mount(
-      '/camera-images',
-      staticServer(process.env.IMAGE_DIR, {
-        maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
-      })
-    )
-  );
-
-  router.get('/', renderIndex);
-  router.get('/index.html', renderIndex);
-
-  app.use(
-    staticServer(path.join(__dirname, 'client/build'), {
-      maxage: 1000 * 60 * 60 * 24 * 365 // 1 year
-    })
-  );
+  app.use(router.routes());
+  app.use(router.allowedMethods());
 
   console.warn('Server starting...');
   app.listen(process.env.SERVER_PORT);
 }
 
-async function renderIndex({ response }) {
-  const images = imageList();
+async function serveCameraImage(ctx) {
+  const imageFile = ctx.params['0'];
 
-  response.body = indexPage.replace('!!!image_data!!!', JSON.stringify(images));
+  try {
+    await send(ctx, imageFile, {
+      root: process.env.IMAGE_DIR,
+      maxAge: ONE_YEAR_IN_MILLISECONDS,
+      immutable: true
+    });
+  } catch (e) {
+    ctx.status = 404;
+  }
+}
+
+async function renderAsset(ctx) {
+  const filePath = ctx.params['0'];
+
+  try {
+    if (filePath === '/' || filePath === 'index.html') {
+      throw new Error('Serve index instead');
+    }
+
+    await send(ctx, filePath, {
+      root: path.join(__dirname, 'client/build'),
+      maxAge: ONE_YEAR_IN_MILLISECONDS,
+      immutable: true
+    });
+  } catch (e) {
+    ctx.response.body = indexPage.replace('!!!image_data!!!', JSON.stringify(imageList()));
+  }
 }
 
 async function listImages({ response }) {
@@ -139,15 +150,11 @@ function imageList() {
 }
 
 async function deleteImage({ response, params }) {
-  console.log(params.password, process.env.ADMIN_PASSWORD);
-
   if (params.password === process.env.ADMIN_PASSWORD) {
-    const info = deleteStml.run({
+    deleteStml.run({
       file_name: params.image_id,
       deleted_at: Math.floor(Date.now() / 1000)
     });
-
-    console.log({ info });
   }
 
   response.status = 200;
