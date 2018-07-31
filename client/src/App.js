@@ -76,7 +76,7 @@ class App extends Component {
               src: `/camera-images/${image.file_name}.jpg`,
               thumbnail: `/camera-images/${image.file_name}_thumb.jpg`,
               thumbnailWidth: 170,
-              thumbnailHeight: 145,
+              thumbnailHeight: 123,
               margin: 1,
               caption: `${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello  HH:mm', { locale: fi })}, lämpötila: ${image.temperature}°C`
             }))} />
