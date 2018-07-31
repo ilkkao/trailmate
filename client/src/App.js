@@ -69,6 +69,7 @@ class App extends Component {
             rowHeight={123}
             imageCountSeparator=" / "
             backdropClosesModal={true}
+            lightboxWidth={1279}
             enableImageSelection={!!query.password}
             onSelectImage={(index, image) => this.onDeleteImage(image.imageId, query.password)}
             images={eventImages.map(image => ({
