@@ -66,7 +66,7 @@ class App extends Component {
           <Gallery
             margin={1}
             showLightboxThumbnails={true}
-            rowHeight={145}
+            rowHeight={123}
             imageCountSeparator=" / "
             backdropClosesModal={true}
             enableImageSelection={!!query.password}
