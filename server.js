@@ -22,6 +22,7 @@ const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
+let newImageCount = 0;
 let sendEmailTimer = null;
 
 db.prepare(
@@ -267,6 +268,8 @@ async function ocrMetaDataImage(metaDataImage) {
 }
 
 function scheduleNewImageNotification() {
+  newImageCount++;
+
   if (sendEmailTimer) {
     clearTimeout(sendEmailTimer);
   }
@@ -278,13 +281,14 @@ function sendNewImageNotification() {
   const data = {
     from: process.env.MAILGUN_FROM,
     to: process.env.MAILGUN_TO,
-    subject: 'Uusi vierailu riistakameralla',
-    text: '\n\nUusia kuvia.\n\nKäy katsomassa: https://riistakamera.eu'
+    subject: `${newImageCount} uutta riistakamerakuvaa`,
+    text: '\n\nUusia vierailu.\n\nKäy katsomassa: https://riistakamera.eu'
   };
 
   console.log('Sending email notification');
 
   mailgunSender.messages().send(data);
 
+  newImageCount = 0;
   sendEmailTimer = null;
 }
