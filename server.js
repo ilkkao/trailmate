@@ -11,13 +11,18 @@ const sharp = require('sharp');
 const Tesseract = require('tesseract.js');
 const uuid = require('uid2');
 const Database = require('better-sqlite3');
+const mailgun = require('mailgun-js');
 
 const db = new Database(process.env.DB_FILE);
 
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
+const GROUPING_THRESHOLD_IN_MS = GROUPING_THRESHOLD * 1000;
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
+const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
+
+let sendEmailTimer = null;
 
 db.prepare(
   `
@@ -202,6 +207,8 @@ async function processNewImage(dateString, filePath) {
 
   console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
   console.log('Image processed succesfully');
+
+  scheduleNewImageNotification();
 }
 
 async function extractMetaDataImage(filePath) {
@@ -257,4 +264,27 @@ async function ocrMetaDataImage(metaDataImage) {
         return resolve({ ocrDate, ocrTemperature });
       });
   });
+}
+
+function scheduleNewImageNotification() {
+  if (sendEmailTimer) {
+    clearTimeout(sendEmailTimer);
+  }
+
+  sendEmailTimer = setTimeout(sendNewImageNotification, GROUPING_THRESHOLD_IN_MS);
+}
+
+function sendNewImageNotification() {
+  const data = {
+    from: process.env.MAILGUN_FROM,
+    to: process.env.MAILGUN_TO,
+    subject: 'Uusi vierailu riistakameralla',
+    text: '\n\nUusia kuvia.\n\nKäy katsomassa: https://riistakamera.eu'
+  };
+
+  console.log('Sending email notification');
+
+  mailgunSender.messages().send(data);
+
+  sendEmailTimer = null;
 }
