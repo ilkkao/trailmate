@@ -128,7 +128,7 @@ async function renderAsset(ctx) {
       immutable: true
     });
   } catch (e) {
-    ctx.response.body = indexPage.replace('!!!image_data!!!', JSON.stringify(imageList()));
+    ctx.response.body = indexPage.replace('["!image_data!"]', JSON.stringify(imageList()));
   }
 }
 

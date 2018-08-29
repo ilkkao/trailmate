@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  max-width: 920px;
+  max-width: 850px;
 }
 
 .title {
@@ -31,7 +31,6 @@
   padding: 2rem;
   margin: 1rem 0;
   width: 90%;
-  max-width: 752px;
   box-sizing: border-box;
   min-height: 1px;
   background: #f4f4f4;
@@ -40,6 +39,13 @@
   position: relative;
 
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.activity-thumbnail {
+  width: 32vw;
+  max-width: 170px;
+  margin-right: 3px;
+  cursor: pointer;
 }
 
 .camera-icon {
