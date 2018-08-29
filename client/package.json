@@ -7,7 +7,7 @@
     "qs": "^6.5.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-grid-gallery": "^0.5.1",
+    "react-image-lightbox": "^5.0.0",
     "react-scripts": "1.1.4"
   },
   "scripts": {
