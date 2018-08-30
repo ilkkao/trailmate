@@ -126,7 +126,6 @@ class App extends Component {
             prevSrc={computeUrl(lightboxImages[(lightboxIndex + lightboxImages.length - 1) % lightboxImages.length])}
             onCloseRequest={this.onCloseViewer}
             imageCaption={lightboxCaption}
-            imagePadding={50}
             onMoveNextRequest={this.onMoveNextRequest}
             onMovePrevRequest={this.onMovePrevRequest}
           />
