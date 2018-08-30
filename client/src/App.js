@@ -16,6 +16,9 @@ class App extends Component {
 
     this.onDeleteImage = this.onDeleteImage.bind(this);
     this.onOpenViewer = this.onOpenViewer.bind(this);
+    this.onCloseViewer = this.onCloseViewer.bind(this);
+    this.onMoveNextRequest = this.onMoveNextRequest.bind(this);
+    this.onMovePrevRequest = this.onMovePrevRequest.bind(this);
     this.updateImages = this.updateImages.bind(this);
 
     this.state = {
@@ -23,7 +26,7 @@ class App extends Component {
       lightboxImages: [],
       lightboxCaption: '',
       lightboxIndex: 0,
-      lightboxOpen: false,
+      lightboxOpen: false
     };
 
     if (!window.preloadedImages) {
@@ -49,12 +52,35 @@ class App extends Component {
     }
   }
 
-  onOpenViewer(lightboxImages, lightboxIndex, lightboxCaption) {
-    this.setState({ lightboxImages, lightboxIndex, lightboxCaption, lightboxOpen: true });
+  onOpenViewer(eventImages, imageIndex) {
+    this.setState({
+      lightboxImages: eventImages,
+      lightboxIndex: imageIndex,
+      lightboxOpen: true
+    });
+  }
+
+  onCloseViewer() {
+    this.setState({ lightboxOpen: false });
+  }
+
+  onMoveNextRequest() {
+    this.setState({
+      lightboxIndex: (this.state.lightboxIndex + 1) % this.state.lightboxImages.length
+    });
+  }
+
+  onMovePrevRequest() {
+    this.setState({
+      lightboxIndex: (this.state.lightboxIndex + this.state.lightboxImages.length - 1) % this.state.lightboxImages.length
+    });
   }
 
   render() {
-    const { images, lightboxIndex, lightboxOpen, lightboxImages, lightboxCaption } = this.state;
+    const { images, lightboxIndex, lightboxOpen, lightboxImages } = this.state;
+
+    const lightboxCaption = lightboxOpen &&
+      `Kuva: ${lightboxIndex + 1}/${lightboxImages.length} - ${format(new Date(lightboxImages[lightboxIndex].email_created_at * 1000), 'DD.MM.YYYY kello HH:mm', { locale: fi })} - Lämpötila: ${lightboxImages[lightboxIndex].temperature}°C`;
 
     // const query = qs.parse(window.location.search, { ignoreQueryPrefix: true });
 
@@ -80,37 +106,29 @@ class App extends Component {
               <img
                 key={image.file_name}
                 alt="Riistakameran kuva"
-                onClick={() => this.onOpenViewer(
-                  eventImages.map(image => `/camera-images/${image.file_name}.jpg`),
-                  imageIndex,
-                  `Kuva: ${imageIndex + 1}/${eventImages.length} - Aika: ${format(new Date(image.email_created_at * 1000), 'DD.MM.YYYY kello HH:mm', { locale: fi })} - Lämpötila: ${image.temperature}°C`
-                  )}
-                className="activity-thumbnail" src={`/camera-images/${image.file_name}_thumb.jpg`}></img>)}
+                onClick={() => this.onOpenViewer(eventImages, imageIndex)}
+                className="activity-thumbnail" src={`/camera-images/${image.file_name}_thumb.jpg`}>
+              </img>
+            )}
           </div>
         </div>
       );
     });
 
+    const computeUrl = (image) => `/camera-images/${image.file_name}.jpg`;
+
     return (
       <div className="main-container">
          {lightboxOpen && (
           <Lightbox
-            mainSrc={lightboxImages[lightboxIndex]}
-            nextSrc={lightboxImages[(lightboxIndex + 1) % lightboxImages.length]}
-            prevSrc={lightboxImages[(lightboxIndex + lightboxImages.length - 1) % lightboxImages.length]}
-            onCloseRequest={() => this.setState({ lightboxOpen: false })}
+            mainSrc={computeUrl(lightboxImages[lightboxIndex])}
+            nextSrc={computeUrl(lightboxImages[(lightboxIndex + 1) % lightboxImages.length])}
+            prevSrc={computeUrl(lightboxImages[(lightboxIndex + lightboxImages.length - 1) % lightboxImages.length])}
+            onCloseRequest={this.onCloseViewer}
             imageCaption={lightboxCaption}
             imagePadding={50}
-            onMovePrevRequest={() =>
-              this.setState({
-                lightboxIndex: (lightboxIndex + lightboxImages.length - 1) % lightboxImages.length,
-              })
-            }
-            onMoveNextRequest={() =>
-              this.setState({
-                lightboxIndex: (lightboxIndex + 1) % lightboxImages.length,
-              })
-            }
+            onMoveNextRequest={this.onMoveNextRequest}
+            onMovePrevRequest={this.onMovePrevRequest}
           />
         )}
         <header>
