@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { distanceInWords, differenceInHours, format } from 'date-fns'
+import { formatDistance, differenceInHours, format } from 'date-fns'
 import fi from 'date-fns/locale/fi';
 // import qs from 'qs';
 
@@ -88,9 +88,9 @@ class App extends Component {
       const firstEmailCreatedAt = new Date(eventImages[0].email_created_at * 1000);
       const lastEmailCreatedAt = new Date(eventImages[eventImages.length - 1].email_created_at * 1000);
 
-      const dateString = distanceInWords(firstEmailCreatedAt, new Date(), { locale: fi })
+      const dateString = formatDistance(firstEmailCreatedAt, new Date(), { locale: fi })
       const timeString = format(firstEmailCreatedAt, 'HH:mm')
-      const duration = distanceInWords(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
+      const duration = formatDistance(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
 
       const newTag = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24
         ? <span className="activity-new">UUSI - ALLE 24H</span>
@@ -119,7 +119,7 @@ class App extends Component {
 
     return (
       <div className="main-container">
-         {lightboxOpen && (
+        {lightboxOpen && (
           <Lightbox
             mainSrc={computeUrl(lightboxImages[lightboxIndex])}
             nextSrc={computeUrl(lightboxImages[(lightboxIndex + 1) % lightboxImages.length])}
