@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { formatDistance, differenceInHours, format } from 'date-fns'
+import { formatDistance, differenceInHours, format } from 'date-fns';
 import fi from 'date-fns/locale/fi';
 // import qs from 'qs';
 
@@ -40,7 +40,7 @@ class App extends Component {
     const res = await fetch('/api/images.json');
     const images = await res.json();
 
-    this.setState({ images })
+    this.setState({ images });
   }
 
   async onDeleteImage(imageId, password) {
@@ -72,50 +72,61 @@ class App extends Component {
 
   onMovePrevRequest() {
     this.setState({
-      lightboxIndex: (this.state.lightboxIndex + this.state.lightboxImages.length - 1) % this.state.lightboxImages.length
+      lightboxIndex:
+        (this.state.lightboxIndex + this.state.lightboxImages.length - 1) % this.state.lightboxImages.length
     });
   }
 
   render() {
     const { images, lightboxIndex, lightboxOpen, lightboxImages } = this.state;
 
-    const lightboxCaption = lightboxOpen &&
-      `Kuva: ${lightboxIndex + 1}/${lightboxImages.length} - ${format(new Date(lightboxImages[lightboxIndex].email_created_at * 1000), 'DD.MM.YYYY kello HH:mm', { locale: fi })} - Lämpötila: ${lightboxImages[lightboxIndex].temperature}°C`;
+    const lightboxCaption =
+      lightboxOpen &&
+      `Kuva: ${lightboxIndex + 1}/${lightboxImages.length} - ${format(
+        new Date(lightboxImages[lightboxIndex].email_created_at * 1000),
+        `dd.MM.yyyy 'kello' HH:mm`,
+        { locale: fi }
+      )} - Lämpötila: ${lightboxImages[lightboxIndex].temperature}°C`;
 
     // const query = qs.parse(window.location.search, { ignoreQueryPrefix: true });
 
     const boxes = images.map((eventImages, index) => {
       const firstEmailCreatedAt = new Date(eventImages[0].email_created_at * 1000);
       const lastEmailCreatedAt = new Date(eventImages[eventImages.length - 1].email_created_at * 1000);
+      const dateString = formatDistance(firstEmailCreatedAt, new Date(), { locale: fi });
+      const timeString = format(firstEmailCreatedAt, 'HH:mm');
+      const duration = formatDistance(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi });
 
-      const dateString = formatDistance(firstEmailCreatedAt, new Date(), { locale: fi })
-      const timeString = format(firstEmailCreatedAt, 'HH:mm')
-      const duration = formatDistance(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi })
-
-      const newTag = Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24
-        ? <span className="activity-new">UUSI - ALLE 24H</span>
-        : null;
+      const newTag =
+        Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? (
+          <span className="activity-new">UUSI - ALLE 24H</span>
+        ) : null;
 
       return (
         <div className="activity" key={eventImages.map(image => image.file_name).join()}>
           <img src={camera} className="camera-icon" alt="[camera]" />
-          <span className="activity-title">#{images.length - index} {newTag}</span>
-          <div className="activity-description">Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.</div>
+          <span className="activity-title">
+            Vierailu #{images.length - index} {newTag}
+          </span>
+          <div className="activity-description">
+            Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.
+          </div>
           <div>
-            {eventImages.map((image, imageIndex) =>
+            {eventImages.map((image, imageIndex) => (
               <img
                 key={image.file_name}
                 alt="Riistakameran kuva"
                 onClick={() => this.onOpenViewer(eventImages, imageIndex)}
-                className="activity-thumbnail" src={`/camera-images/${image.file_name}_thumb.jpg`}>
-              </img>
-            )}
+                className="activity-thumbnail"
+                src={`/camera-images/${image.file_name}_thumb.jpg`}
+              ></img>
+            ))}
           </div>
         </div>
       );
     });
 
-    const computeUrl = (image) => `/camera-images/${image.file_name}.jpg`;
+    const computeUrl = image => `/camera-images/${image.file_name}.jpg`;
 
     return (
       <div className="main-container">
