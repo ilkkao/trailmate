@@ -1,10 +1,10 @@
-FROM node:10
+FROM node:14
 
 WORKDIR /app/server/
 
 COPY package.json yarn.lock /app/server/
 
-RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb
+RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb
 RUN dpkg -i dumb-init_*.deb
 
 RUN apt-get update && apt-get install sqlite3
