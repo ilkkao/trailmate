@@ -4,7 +4,7 @@ services:
     image: 'riistaweb:latest'
     build: .
     restart: always
-#    volumes:
-#      - /data/riistaweb:/data
+    volumes:
+      - /data/riistaweb:/data
     ports:
       - "3000:3000"
