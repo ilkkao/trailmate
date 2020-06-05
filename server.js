@@ -15,15 +15,14 @@ const mailgun = require('mailgun-js');
 
 const db = new Database(process.env.DB_FILE);
 
+const EMAIL_FREQUENCEY = 1000 * 60 * 60 * 24; // 1day
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
-const GROUPING_THRESHOLD_IN_MS = GROUPING_THRESHOLD * 1000;
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
 const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
 let newImageCount = 0;
-let sendEmailTimer = null;
 
 db.prepare(
   `
@@ -79,13 +78,17 @@ const deleteStml = db.prepare(`
 
 init();
 
+setInterval(sendNewImageNotification, EMAIL_FREQUENCEY);
+
 process.on('exit', () => Tesseract.terminate());
 
 async function init() {
   const app = new Koa();
   const router = new Router();
 
-  app.use(logger());
+  if (process.env.VERBOSE === 'true') {
+    app.use(logger());
+  }
 
   router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
   router.get('/api/images.json', listImages);
@@ -190,26 +193,27 @@ async function processNewImage(dateString, filePath) {
   await saveThumbnailImage(filePath, 170, `${baseFileName}_thumb.jpg`);
 
   console.log('Extracting the metadata region');
-  const metaDataImage = await extractMetaDataImage(filePath);
+  //  const metaDataImage = await extractMetaDataImage(filePath);
 
   console.log('OCR reading the metadata region');
-  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
+  //  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
 
   // TODO: Delete temp file
 
-  console.log('Creating a database entry');
+  const emailCreatedAtDateInSeconds = Math.floor(emailCreatedAtDate.getTime() / 1000);
+
+  console.log('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName });
+
   insertStmt.run({
     file_name: baseFileName,
-    email_created_at: emailCreatedAtDate.getTime() / 1000,
-    ocr_created_at: ocrDate && ocrDate.getTime() / 1000,
-    temperature: ocrTemperature,
+    email_created_at: emailCreatedAtDateInSeconds,
+    ocr_created_at: null, // ocrDate && ocrDate.getTime() / 1000,
+    temperature: null, // ocrTemperature,
     created_at: Math.floor(Date.now() / 1000)
   });
 
   console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
   console.log('Image processed succesfully');
-
-  scheduleNewImageNotification();
 }
 
 async function extractMetaDataImage(filePath) {
@@ -267,22 +271,16 @@ async function ocrMetaDataImage(metaDataImage) {
   });
 }
 
-function scheduleNewImageNotification() {
-  newImageCount++;
-
-  if (sendEmailTimer) {
-    clearTimeout(sendEmailTimer);
+function sendNewImageNotification() {
+  if (newImageCount === 0) {
+    return;
   }
 
-  sendEmailTimer = setTimeout(sendNewImageNotification, GROUPING_THRESHOLD_IN_MS);
-}
-
-function sendNewImageNotification() {
   const data = {
     from: process.env.MAILGUN_FROM,
     to: process.env.MAILGUN_TO,
     subject: `${newImageCount} uutta riistakamerakuvaa`,
-    text: '\n\nUusia vierailu.\n\nKäy katsomassa: https://riistakamera.eu'
+    text: '\n\nUusia vierailuja tallennettu.\n\nKäy katsomassa osoitteessa: https://riistakamera.eu'
   };
 
   console.log('Sending email notification');
@@ -290,5 +288,4 @@ function sendNewImageNotification() {
   mailgunSender.messages().send(data);
 
   newImageCount = 0;
-  sendEmailTimer = null;
 }
