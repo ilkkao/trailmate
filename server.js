@@ -193,12 +193,10 @@ async function processNewImage(dateString, filePath) {
   await saveThumbnailImage(filePath, 170, `${baseFileName}_thumb.jpg`);
 
   console.log('Extracting the metadata region');
-  //  const metaDataImage = await extractMetaDataImage(filePath);
+  const metaDataImage = await extractMetaDataImage(filePath);
 
   console.log('OCR reading the metadata region');
-  //  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
-
-  // TODO: Delete temp file
+  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
 
   const emailCreatedAtDateInSeconds = Math.floor(emailCreatedAtDate.getTime() / 1000);
 
@@ -207,8 +205,8 @@ async function processNewImage(dateString, filePath) {
   insertStmt.run({
     file_name: baseFileName,
     email_created_at: emailCreatedAtDateInSeconds,
-    ocr_created_at: null, // ocrDate && ocrDate.getTime() / 1000,
-    temperature: null, // ocrTemperature,
+    ocr_created_at: ocrDate && ocrDate.getTime() / 1000,
+    temperature: ocrTemperature,
     created_at: Math.floor(Date.now() / 1000)
   });
 
@@ -218,7 +216,7 @@ async function processNewImage(dateString, filePath) {
 
 async function extractMetaDataImage(filePath) {
   return sharp(filePath)
-    .extract({ left: 520, top: 932, width: 565, height: 26 })
+    .extract({ left: 520, top: 932, width: 635, height: 26 })
     .toBuffer({ resolveWithObject: true })
     .then(({ data }) => data);
 }
@@ -240,7 +238,7 @@ async function ocrMetaDataImage(metaDataImage) {
   return new Promise((resolve, reject) => {
     Tesseract.recognize(metaDataImage)
       .catch(err => reject(err))
-      .then(({ text }) => {
+      .then(({ data: { text } }) => {
         let ocrDate = null;
         let ocrTemperature = null;
 
