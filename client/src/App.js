@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { formatDistance, differenceInHours, format } from 'date-fns';
 import fi from 'date-fns/locale/fi';
-// import qs from 'qs';
+import Mousetrap from 'mousetrap';
 
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
@@ -33,6 +33,12 @@ class App extends Component {
       this.updateImages();
     }
 
+    Mousetrap.bind('f o o b a r', () => {
+      if (!this.state.lightboxOpen) {
+        return;
+      }
+    });
+
     setInterval(this.updateImages, 10000);
   }
 
@@ -44,11 +50,12 @@ class App extends Component {
   }
 
   async onDeleteImage(imageId, password) {
-    const confirmed = confirm(`Deleting image ${imageId}. Are you sure?`); // eslint-disable-line no-restricted-globals
+    const confirmed = confirm(`Haluatko varmasti tuhota kuvan?`); // eslint-disable-line no-restricted-globals
 
     if (confirmed) {
       await fetch(`/api/delete_image/${imageId}/${password}`, { method: 'DELETE' });
       this.updateImages();
+      this.onCloseViewer();
     }
   }
 
@@ -87,8 +94,6 @@ class App extends Component {
         `dd.MM.yyyy 'kello' HH:mm`,
         { locale: fi }
       )} - Lämpötila: ${lightboxImages[lightboxIndex].temperature}°C`;
-
-    // const query = qs.parse(window.location.search, { ignoreQueryPrefix: true });
 
     const boxes = images.map((eventImages, index) => {
       const firstEmailCreatedAt = new Date(eventImages[0].email_created_at * 1000);
