@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
+const cron = require('cron');
 const Koa = require('koa');
 const send = require('koa-send');
 const Router = require('koa-router');
@@ -22,7 +23,7 @@ const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
 
-let newImageCount = 0;
+new cron.CronJob('0 0 6 * * *', sendNewImageNotification).start();
 
 db.prepare(
   `
@@ -67,6 +68,14 @@ const queryStml = db.prepare(`
     deleted_at IS NULL
   ORDER BY
     email_created_at ASC`);
+
+const queryNewStml = db.prepare(`
+  SELECT
+    count(*)
+  FROM
+    images
+  WHERE
+    datetime(email_created_at, 'unixepoch') >= datetime('now', '-24 Hour') AND deleted_at IS NULL`);
 
 const deleteStml = db.prepare(`
   UPDATE
@@ -202,16 +211,20 @@ async function processNewImage(dateString, filePath) {
 
   console.log('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName });
 
-  insertStmt.run({
-    file_name: baseFileName,
-    email_created_at: emailCreatedAtDateInSeconds,
-    ocr_created_at: ocrDate && ocrDate.getTime() / 1000,
-    temperature: ocrTemperature,
-    created_at: Math.floor(Date.now() / 1000)
-  });
+  try {
+    insertStmt.run({
+      file_name: baseFileName,
+      email_created_at: emailCreatedAtDateInSeconds,
+      ocr_created_at: ocrDate && Math.floor(ocrDate.getTime() / 1000),
+      temperature: ocrTemperature,
+      created_at: Math.floor(Date.now() / 1000)
+    });
 
-  console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
-  console.log('Image processed succesfully');
+    console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
+    console.log('Image processed succesfully');
+  } catch (e) {
+    console.log('Failed to add image metadata to the db, ignoring', err);
+  }
 }
 
 async function extractMetaDataImage(filePath) {
@@ -270,6 +283,8 @@ async function ocrMetaDataImage(metaDataImage) {
 }
 
 function sendNewImageNotification() {
+  const newImageCount = queryNewStml.run();
+
   if (newImageCount === 0) {
     return;
   }
@@ -284,6 +299,4 @@ function sendNewImageNotification() {
   console.log('Sending email notification');
 
   mailgunSender.messages().send(data);
-
-  newImageCount = 0;
 }
