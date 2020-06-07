@@ -147,18 +147,36 @@ class App extends Component {
           />
         )}
         <header>
-          <div className="title"><img src={logo} className="logo" alt="logo" />Riistakamera Parkano</div>
-          <div className="info">Trailcam</div>
+          <div className="title">
+            <img src={logo} className="logo" alt="logo" />
+            Pirkanmaan riistakamera
+          </div>
+          <div className="info">
+            Klikkaa kuvaa nähdäksesi se suurempana. Uudet kuvat ilmestyvät sivulle automaattisesti suoraan metsästä noin
+            minuutin viiveellä. Palautetta voit lähettää <a href="mailto:palaute@riistakamera.eu">sähköpostilla</a>.
+            Kamera Burrel S12 HD+SMS II.
+          </div>
         </header>
         {boxes}
         <footer className="footer">
-          Icons made by
-          <a href="http://www.freepik.com" rel="noopener" title="Freepik">Freepik</a>
-          from
-          <a href="https://www.flaticon.com/" rel="noopener" title="Flaticon">www.flaticon.com</a>
-          are licensed by
-          <a href="http://creativecommons.org/licenses/by/3.0/" rel="noopener" title="Creative Commons BY 3.0">CC 3.0 BY</a>
-          Kuvat: &copy; 2018 Ilkka ja Oiva Oksanen.
+          Icons made by{' '}
+          <a href="http://www.freepik.com" rel="noopener" title="Freepik">
+            Freepik
+          </a>{' '}
+          from{' '}
+          <a href="https://www.flaticon.com/" rel="noopener" title="Flaticon">
+            www.flaticon.com
+          </a>{' '}
+          are licensed by{' '}
+          <a
+            href="http://creativecommons.org/licenses/by/3.0/"
+            rel="noopener"
+            title="Creative Commons BY 3.0"
+            target="_blank"
+          >
+            CC 3.0 BY
+          </a>{' '}
+          Images: &copy; 2018 riistakamera.eu
         </footer>
       </div>
     );
