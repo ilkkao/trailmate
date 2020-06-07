@@ -16,7 +16,6 @@ const mailgun = require('mailgun-js');
 
 const db = new Database(process.env.DB_FILE);
 
-const EMAIL_FREQUENCEY = 1000 * 60 * 60 * 24; // 1day
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
@@ -86,8 +85,6 @@ const deleteStml = db.prepare(`
     file_name=$file_name`);
 
 init();
-
-setInterval(sendNewImageNotification, EMAIL_FREQUENCEY);
 
 process.on('exit', () => Tesseract.terminate());
 
@@ -209,7 +206,7 @@ async function processNewImage(dateString, filePath) {
 
   const emailCreatedAtDateInSeconds = Math.floor(emailCreatedAtDate.getTime() / 1000);
 
-  console.log('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName });
+  console.log('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName, ocrDate, ocrTemperature });
 
   try {
     insertStmt.run({
@@ -220,8 +217,7 @@ async function processNewImage(dateString, filePath) {
       created_at: Math.floor(Date.now() / 1000)
     });
 
-    console.log({ baseFileName, emailCreatedAtDate, ocrDate, ocrTemperature });
-    console.log('Image processed succesfully');
+    console.log('Image processed successfully');
   } catch (e) {
     console.log('Failed to add image metadata to the db, ignoring', err);
   }
@@ -255,7 +251,7 @@ async function ocrMetaDataImage(metaDataImage) {
         let ocrDate = null;
         let ocrTemperature = null;
 
-        console.log(`OCR string: ${text}`);
+        console.log(`OCR string: ${text.replace(/\n/, '')}`);
 
         try {
           const [, day, month, year] = text.match(/(\d\d)\/(\d\d)\/(\d\d\d\d)/);
@@ -291,7 +287,7 @@ function sendNewImageNotification() {
 
   const data = {
     from: process.env.MAILGUN_FROM,
-    to: process.env.MAILGUN_TO,
+    bcc: process.env.MAILGUN_TO,
     subject: `${newImageCount} uutta riistakamerakuvaa`,
     text: '\n\nUusia kuvia tallennettu viimeisen 24h aikana.\n\nKäy katsomassa osoitteessa: https://riistakamera.eu'
   };
