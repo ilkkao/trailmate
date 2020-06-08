@@ -2,13 +2,20 @@ import React, { Component } from 'react';
 import { formatDistance, differenceInHours, format } from 'date-fns';
 import fi from 'date-fns/locale/fi';
 import Mousetrap from 'mousetrap';
-
+import ReactGA from 'react-ga';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
 
 import logo from './moose-shape.svg';
 import camera from './photo-camera.svg';
 import './App.css';
+
+const gaId = process.env.REACT_APP_GOOGLE_ANALYTICS_ID;
+
+if (gaId) {
+  ReactGA.initialize(gaId);
+  ReactGA.pageview(window.location.pathname + window.location.search); // TODO: Make more granular.
+}
 
 class App extends Component {
   constructor() {
