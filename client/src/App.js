@@ -40,10 +40,13 @@ class App extends Component {
       this.updateImages();
     }
 
-    Mousetrap.bind('f o o b a r', () => {
+    Mousetrap.bind('d', () => {
       if (!this.state.lightboxOpen) {
         return;
       }
+
+      const password = window.prompt('Deleting image, password required');
+      this.onDeleteImage(this.state.lightboxImages[this.state.lightboxIndex].file_name, password);
     });
 
     setInterval(this.updateImages, 10000);
@@ -57,13 +60,9 @@ class App extends Component {
   }
 
   async onDeleteImage(imageId, password) {
-    const confirmed = confirm(`Haluatko varmasti tuhota kuvan?`); // eslint-disable-line no-restricted-globals
-
-    if (confirmed) {
-      await fetch(`/api/delete_image/${imageId}/${password}`, { method: 'DELETE' });
-      this.updateImages();
-      this.onCloseViewer();
-    }
+    await fetch(`/api/delete_image/${imageId}/${password}`, { method: 'DELETE' });
+    this.updateImages();
+    this.onCloseViewer();
   }
 
   onOpenViewer(eventImages, imageIndex) {
