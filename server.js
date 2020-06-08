@@ -287,6 +287,7 @@ function sendNewImageNotification() {
 
   const data = {
     from: process.env.MAILGUN_FROM,
+    to: process.env.MAILGUN_FROM,
     bcc: process.env.MAILGUN_TO,
     subject: `${newImageCount} uutta riistakamerakuvaa`,
     text: '\n\nUusia kuvia tallennettu viimeisen 24h aikana.\n\nKäy katsomassa osoitteessa: https://riistakamera.eu'
