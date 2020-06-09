@@ -97,6 +97,7 @@ async function init() {
   }
 
   router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
+  router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
   router.get('/api/images.json', listImages);
   router.delete('/api/delete_image/:image_id/:password', deleteImage);
   router.get(/^\/camera-images\/(.*)/, serveCameraImage);
