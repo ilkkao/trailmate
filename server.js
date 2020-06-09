@@ -137,7 +137,7 @@ async function renderAsset(ctx) {
       immutable: true
     });
   } catch (e) {
-    const preloadedImages = `window.preloadedImages = [ '${JSON.stringify(imageList())}' ];\n`;
+    const preloadedImages = `\nwindow.preloadedImages = ${JSON.stringify(imageList(), null, 2)};\n`;
     ctx.response.body = indexPage.replace('/*!!!preloadedImages!!!*/', preloadedImages);
   }
 }
