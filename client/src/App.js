@@ -176,7 +176,7 @@ class App extends Component {
           are licensed by{' '}
           <a
             href="http://creativecommons.org/licenses/by/3.0/"
-            rel="noopener"
+            rel="noopener noreferrer"
             title="Creative Commons BY 3.0"
             target="_blank"
           >
