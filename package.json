@@ -1,11 +1,10 @@
 {
-  "name": "riistaweb",
-  "version": "1.0.0",
+  "name": "trailmate",
+  "version": "0.1.0",
   "description": "Trail cam website",
-  "main": "index.js",
-  "repository": "https://github.com/ilkkao/riistaweb",
+  "repository": "https://github.com/ilkkao/trailmate",
   "author": "Ilkka Oksanen <iao@iki.fi>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "better-sqlite3": "^7.0.1",
     "cron": "^1.8.2",

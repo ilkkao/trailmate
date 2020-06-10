@@ -1,11 +1,10 @@
 {
   "name": "client",
+  "license": "Apache-2.0",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "date-fns": "^2.14.0",
     "mousetrap": "^1.6.5",
-    "qs": "^6.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-ga": "^3.0.0",
