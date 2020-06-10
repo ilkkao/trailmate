@@ -1,4 +1,5 @@
-.git
-node_modules
-client/node_modules
-data
+**/.git
+**/node_modules
+**/client/node_modules
+**/client/build
+**//test-data
