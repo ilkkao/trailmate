@@ -221,7 +221,7 @@ async function processNewImage(dateString, filePath) {
 
     console.log('Image processed successfully');
   } catch (e) {
-    console.log('Failed to add image metadata to the db, ignoring', err);
+    console.log('Failed to add image metadata to the db, ignoring', e);
   }
 }
 
