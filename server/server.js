@@ -20,7 +20,7 @@ const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
 const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
-const indexPage = fs.readFileSync(path.join(__dirname, 'client/build/index.html'), 'utf8');
+const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
 
 new cron.CronJob('0 0 3 * * *', sendNewImageNotification).start();
 
@@ -133,7 +133,7 @@ async function renderAsset(ctx) {
     }
 
     await send(ctx, filePath, {
-      root: path.join(__dirname, 'client/build'),
+      root: path.join(__dirname, '../client/build'),
       maxAge: ONE_YEAR_IN_MILLISECONDS,
       immutable: true
     });
