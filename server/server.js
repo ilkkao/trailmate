@@ -10,19 +10,18 @@ const emailNotificationSender = require('./email-notification-sender');
 const imageProcessor = require('./image-processor');
 const config = require('./config');
 const logger = require('./logger');
-
-emailNotificationSender.start();
+const i18n = require('./i18n');
 
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
-
-const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
 
 init();
 
 async function init() {
   const app = new Koa();
   const router = new Router();
+
+  emailNotificationSender.start();
 
   if (config.get('verbose')) {
     app.use(koaLogger());
@@ -38,25 +37,35 @@ async function init() {
     koaBody({ multipart: true }),
     imageProcessor.processNewImageRequest
   ); // Legacy support
+
   router.get('/api/images.json', listImages);
-  router.delete('/api/delete_image/:image_id/:password', deleteImage);
-  router.get(/^\/camera-images\/(.*)/, serveCameraImage);
+  router.delete('/api/images/:image_id/:password', deleteImage);
+  router.get('/api/images/:image_file_name', serveCameraImage);
+
+  router.get(/\/(index.html)?\/*$/, renderIndex);
   router.get(/(.*)/, renderAsset);
 
   app.use(router.routes());
   app.use(router.allowedMethods());
 
   const port = config.get('server_port');
-  logger.info(`Server starting, port ${port}...`);
-  app.listen(port);
+  app.listen(port, () => {
+    logger.info(`Server started, port: ${port}`);
+  });
 }
 
 async function serveCameraImage(ctx) {
-  const imageFile = ctx.params['0'];
+  return renderStaticFile(ctx, ctx.params.image_file_name, config.get('image_dir'));
+}
 
+async function renderAsset(ctx) {
+  return renderStaticFile(ctx, ctx.params['0'], path.join(__dirname, '../client/build'));
+}
+
+async function renderStaticFile(ctx, file, rootDir) {
   try {
-    await send(ctx, imageFile, {
-      root: config.get('image_dir'),
+    await send(ctx, file, {
+      root: rootDir,
       maxAge: ONE_YEAR_IN_MILLISECONDS,
       immutable: true
     });
@@ -65,22 +74,20 @@ async function serveCameraImage(ctx) {
   }
 }
 
-async function renderAsset(ctx) {
-  const filePath = ctx.params['0'];
-
+function renderIndex({ response }) {
   try {
-    if (filePath === '/' || filePath === 'index.html') {
-      throw new Error('Serve index instead');
-    }
+    const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
+    const vars = {
+      locale: config.get('locale'),
+      title: i18n.t('index.title'),
+      description: i18n.t('index.description'),
+      no_js_warning: i18n.t('index.no_js_warning'),
+      js_init: `preloadedImages = ${JSON.stringify(imageList(), null, 2)};`
+    };
 
-    await send(ctx, filePath, {
-      root: path.join(__dirname, '../client/build'),
-      maxAge: ONE_YEAR_IN_MILLISECONDS,
-      immutable: true
-    });
-  } catch (e) {
-    const preloadedImages = `\nwindow.preloadedImages = ${JSON.stringify(imageList(), null, 2)};\n`;
-    ctx.response.body = indexPage.replace('/*!!!preloadedImages!!!*/', preloadedImages);
+    response.body = indexPage.replace(/__([A-Z_]+)__/g, (_, name) => vars[name.toLowerCase()]);
+  } catch {
+    response.body = 'Index.html does not exist';
   }
 }
 

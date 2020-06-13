@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="__LOCALE__">
 
 <head>
   <meta charset="utf-8" />
-  <meta name="Description" content="Suomalainen internet riistakamera Pirkanmaalla" />
+  <meta name="Description" content="__DESCRIPTION__" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
@@ -12,16 +12,18 @@
   <link rel="mask-icon" href="%PUBLIC_URL%/moose.svg" color="#5bbad5" />
   <link rel="icon" type="image/png" href="%PUBLIC_URL%/moose.svg" />
 
-  <title>Pirkanmaan riistakamera</title>
+  <title>__TITLE__</title>
 
   <script>
-    /*!!!preloadedImages!!!*/
+    try {
+      __JS_INIT__
+    } catch (e) { }
   </script>
 </head>
 
 <body>
   <noscript>
-    You need to enable JavaScript to run this app.
+    __NO_JS_WARNING__
   </noscript>
   <div id="root"></div>
 </body>

@@ -4,15 +4,17 @@
   "version": "0.1.0",
   "dependencies": {
     "date-fns": "^2.14.0",
+    "i18next": "^19.4.5",
     "mousetrap": "^1.6.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-ga": "^3.0.0",
+    "react-i18next": "^11.5.1",
     "react-image-lightbox": "^5.1.1",
     "react-scripts": "3.4.1"
   },
   "scripts": {
-    "start-dev": "PORT=3001 env-cmd -f ../.env react-scripts start",
+    "start-dev": "env-cmd -f ../.env react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
@@ -29,5 +31,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "http-proxy-middleware": "^1.0.4"
   }
 }

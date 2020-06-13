@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "env-cmd": "^10.1.0",
     "mocha": "^8.0.1",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0"

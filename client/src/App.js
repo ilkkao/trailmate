@@ -5,7 +5,7 @@ import Mousetrap from 'mousetrap';
 import ReactGA from 'react-ga';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
-
+import { withTranslation } from 'react-i18next';
 import logo from './moose-shape.svg';
 import camera from './photo-camera.svg';
 import './App.css';
@@ -18,8 +18,8 @@ if (gaId) {
 }
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.onDeleteImage = this.onDeleteImage.bind(this);
     this.onOpenViewer = this.onOpenViewer.bind(this);
@@ -45,7 +45,7 @@ class App extends Component {
         return;
       }
 
-      const password = window.prompt('Deleting image, password required');
+      const password = window.prompt(props.t('app.delete_image_password_request'));
       this.onDeleteImage(this.state.lightboxImages[this.state.lightboxIndex].file_name, password);
     });
 
@@ -60,7 +60,7 @@ class App extends Component {
   }
 
   async onDeleteImage(imageId, password) {
-    await fetch(`/api/delete_image/${imageId}/${password}`, { method: 'DELETE' });
+    await fetch(`/api/images/${imageId}/${password}`, { method: 'DELETE' });
     this.updateImages();
     this.onCloseViewer();
   }
@@ -92,14 +92,17 @@ class App extends Component {
 
   render() {
     const { images, lightboxIndex, lightboxOpen, lightboxImages } = this.state;
+    const { t } = this.props;
 
+    const ts = lightboxOpen && new Date(lightboxImages[lightboxIndex].email_created_at * 1000);
     const lightboxCaption =
-      lightboxOpen &&
-      `Kuva: ${lightboxIndex + 1}/${lightboxImages.length} - ${format(
-        new Date(lightboxImages[lightboxIndex].email_created_at * 1000),
-        `dd.MM.yyyy 'kello' HH:mm`,
-        { locale: fi }
-      )} - Lämpötila: ${lightboxImages[lightboxIndex].temperature}°C`;
+      lightboxOpen && t('app.image_caption', {
+        index: lightboxIndex + 1,
+        total: lightboxImages.length,
+        date: format(ts, 'dd.MM.yyyy', { locale: fi }),
+        time: format(ts, 'HH:mm', { locale: fi }),
+        temp: lightboxImages[lightboxIndex].temperature
+      });
 
     const boxes = images.map((eventImages, index) => {
       const firstEmailCreatedAt = new Date(eventImages[0].email_created_at * 1000);
@@ -110,26 +113,26 @@ class App extends Component {
 
       const newTag =
         Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? (
-          <span className="activity-new">UUSI - ALLE 24H</span>
+          <span className="activity-new">${t('app.new_label')}</span>
         ) : null;
 
       return (
         <div className="activity" key={eventImages.map(image => image.file_name).join()}>
           <img src={camera} className="camera-icon" alt="[camera]" />
           <span className="activity-title">
-            Vierailu #{images.length - index} {newTag}
+            {t('app.visit', { count: images.length - index })} {newTag}
           </span>
           <div className="activity-description">
-            Alkoi kello {timeString}, {dateString} sitten. Pituus {duration}.
+            {t('app.timing', { time: timeString, date: dateString, duration })}
           </div>
           <div>
             {eventImages.map((image, imageIndex) => (
               <img
                 key={image.file_name}
-                alt="Riistakameran kuva"
+                alt="Camera image"
                 onClick={() => this.onOpenViewer(eventImages, imageIndex)}
                 className="activity-thumbnail"
-                src={`/camera-images/${image.file_name}_thumb.jpg`}
+                src={`/api/images/${image.file_name}_thumb.jpg`}
               ></img>
             ))}
           </div>
@@ -137,7 +140,7 @@ class App extends Component {
       );
     });
 
-    const computeUrl = image => `/camera-images/${image.file_name}.jpg`;
+    const computeUrl = image => `/api/images/${image.file_name}.jpg`;
 
     return (
       <div className="main-container">
@@ -155,38 +158,25 @@ class App extends Component {
         <header>
           <div className="title">
             <img src={logo} className="logo" alt="logo" />
-            Pirkanmaan riistakamera
+            {t('app.title')}
           </div>
-          <div className="info">
-            Klikkaa kuvaa nähdäksesi se suurempana. Uudet kuvat ilmestyvät sivulle automaattisesti suoraan metsästä noin
-            minuutin viiveellä. Palautetta voit lähettää <a href="mailto:palaute@riistakamera.eu">sähköpostilla</a>.
-            Kamera Burrel S12 HD+SMS II.
-          </div>
+          <div className="info" dangerouslySetInnerHTML={{ __html: t('app.info') }} />
         </header>
         {boxes}
         <footer className="footer">
-          Icons made by{' '}
-          <a href="http://www.freepik.com" rel="noopener" title="Freepik">
-            Freepik
-          </a>{' '}
-          from{' '}
-          <a href="https://www.flaticon.com/" rel="noopener" title="Flaticon">
-            www.flaticon.com
-          </a>{' '}
-          are licensed by{' '}
-          <a
-            href="http://creativecommons.org/licenses/by/3.0/"
-            rel="noopener noreferrer"
-            title="Creative Commons BY 3.0"
-            target="_blank"
-          >
-            CC 3.0 BY
-          </a>{' '}
-          Images: &copy; 2018 riistakamera.eu
+          <span dangerouslySetInnerHTML={{
+            __html:
+              t('app.icons_copyright', {
+                freepik_link: '<a href="http://www.freepik.com" rel="noopener" title="Freepik">Freepik</a>',
+                flaticon_link: '<a href="https://www.flaticon.com/" rel="noopener" title="Flaticon">www.flaticon.com</a>',
+                license_link: '<a href="http://creativecommons.org/licenses/by/3.0/" rel="noopener noreferrer" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>'
+              })
+          }} />{' '}
+          {t('app.images_copyright')}
         </footer>
       </div>
     );
   }
 }
 
-export default App;
+export default withTranslation()(App);
