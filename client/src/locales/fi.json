@@ -1,0 +1,23 @@
+{
+  "email": {
+    "subject": "Yksi uusi riistakamerakuva",
+    "subject_plural": "{{count}} uutta riistakamerakuvaa",
+    "body": "\n\nUusia kuvia tallennettu viimeisen 24h aikana.\n\nKäy katsomassa osoitteessa: {{- url}}"
+  },
+  "index": {
+    "title": "Pirkanmaan riistakamera",
+    "description": "Suomalainen internet riistakamera Pirkanmaalla",
+    "no_js_warning": "JavaScript pitää olla aktivoituna tällä sivulla."
+  },
+  "app": {
+    "delete_image_password_request": "Kirjoita salana tuhotaksesi kuvan.",
+    "visit": "Vierailu {{count}}",
+    "timing": "Alkoi kello {{time}}, {{date}} sitten. Pituus {{duration}}.",
+    "new_label": "UUSI - ALLE 24H",
+    "image_caption": "Kuva {{index}} / {{total}} - {{date}} kello {{time}} - Lämpötila {{temp}}°C",
+    "title": "Pirkanmaan riistakamera",
+    "info": "Klikkaa kuvaa nähdäksesi se suurempana. Uudet kuvat ilmestyvät sivulle automaattisesti suoraan metsästä noin minuutin viiveellä. Palautetta voit lähettää <a href=\"mailto:palaute@riistakamera.eu\">sähköpostilla</a>. Kamera Burrel S12 HD+SMS II.",
+    "icons_copyright": "Icons made by {{freepik_link}} from {{flaticon_link}} are licensed by {{license_link}}",
+    "images_copyright": "Images: © 2020 riistakamera.eu"
+  }
+}

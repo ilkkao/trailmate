@@ -6,7 +6,7 @@ const config = require('./config');
 i18next.use(Backend).init({
   initImmediate: false,
   backend: {
-    loadPath: path.join(__dirname, '../locales/{{lng}}.json')
+    loadPath: path.join(__dirname, '../client/src/locales/{{lng}}.json')
   }
 });
 
