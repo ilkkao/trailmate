@@ -1,0 +1,23 @@
+{
+  "email": {
+    "subject": "One new trail camera image",
+    "subject_plural": "{{count}} new trail camera images",
+    "body": "\n\nCamera has recorded new images during the lat 24 hours.\n\nYou can see them at: {{- url}}"
+  },
+  "index": {
+    "title": "Trailmate images",
+    "description": "Trail camera images",
+    "no_js_warning": "This site requires JavaScript."
+  },
+  "app": {
+    "delete_image_password_request": "Enter password to delete the image.",
+    "visit": "Visit {{count}}",
+    "timing": "Started at {{time}}, {{date}} ago. Duration {{duration}}.",
+    "new_label": "NEW - LESS THAN 24H",
+    "image_caption": "Photo {{index}} / {{total}} - {{date}} at {{time}} - Temperature {{temp}}°C",
+    "title": "Trail camera images",
+    "info": "Click thumbnails to see a detailed photo. New images from the camera appear on this page automatically.",
+    "icons_copyright": "Icons made by {{freepik_link}} from {{flaticon_link}} are licensed by {{license_link}}",
+    "images_copyright": "Images: © 2020 riistakamera.eu"
+  }
+}

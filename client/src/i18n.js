@@ -4,6 +4,7 @@ import dateFnsLocaleFi from 'date-fns/locale/fi';
 import dateFnsLocaleEnUs from 'date-fns/locale/en-US';
 import fi from './locales/fi.json';
 import enUs from './locales/en-us.json';
+import overrides from './locales/overrides.json';
 
 const dateFnsLocales = {
   fi: dateFnsLocaleFi,
@@ -11,6 +12,7 @@ const dateFnsLocales = {
 };
 
 const resources = {
+  overrides: { translation: overrides },
   fi: { translation: fi },
   'en-us': { translation: enUs }
 };
@@ -24,7 +26,8 @@ i18n
   .init({
     resources,
     lowerCaseLng: true,
-    lng: locale,
+    fallbackLng: locale,
+    lng: 'overrides',
     interpolation: {
       escapeValue: false // react already safes from xss
     }
