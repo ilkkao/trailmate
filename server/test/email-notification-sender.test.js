@@ -2,6 +2,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const mailgun = require('../mailgun');
+const i18n = require('../i18n');
 const { insertStmt } = require('../database');
 const emailNotificationSender = require('../email-notification-sender');
 
@@ -9,7 +10,11 @@ const expect = chai.expect;
 chai.use(sinonChai);
 
 describe('emailNotificationSender', () => {
-  it('adds 1 + 2 to equal 3', () => {
+  before(() => {
+    i18n.init();
+  });
+
+  it('notifies about new photo', () => {
     sinon.stub(mailgun, 'sendEmail');
 
     insertStmt.run({
