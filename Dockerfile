@@ -2,12 +2,14 @@ FROM node:14-alpine3.12
 RUN apk add --no-cache sqlite python3 build-base
 
 WORKDIR /app/server/
-COPY server /app/server
+COPY server/package.json server/yarn.lock /app/server/
 RUN yarn install --production
 
 WORKDIR /app/client/
+COPY client/package.json client/yarn.lock /app/client/
+RUN yarn install
 COPY client /app/client
-RUN yarn install && yarn build
+RUN yarn build
 
 FROM node:14-alpine3.12
 RUN apk add --no-cache dumb-init sqlite
