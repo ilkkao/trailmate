@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
+const config = require('./config');
 
-const databaseFilePath = process.env.NODE_ENV === 'test' ? ':memory:' : process.env.DB_FILE;
+const databaseFilePath = config.test ? ':memory:' : config.get('db_file');
 const database = new Database(databaseFilePath);
 
 database
