@@ -78,7 +78,7 @@ function renderIndex({ response }) {
   try {
     const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
     const vars = {
-      locale: config.get('locale'),
+      locale: config.get('react_app_locale'),
       title: i18n.t('index.title'),
       description: i18n.t('index.description'),
       no_js_warning: i18n.t('index.no_js_warning'),

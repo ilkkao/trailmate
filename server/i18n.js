@@ -5,12 +5,13 @@ const config = require('./config');
 
 i18next.use(Backend).init({
   initImmediate: false,
+  lowerCaseLng: true,
   backend: {
     loadPath: path.join(__dirname, '../client/src/locales/{{lng}}.json')
   }
 });
 
-i18next.changeLanguage(config.test ? 'cimode' : config.get('locale'));
+i18next.changeLanguage(config.test ? 'cimode' : config.get('server_locale'));
 
 function t(...args) {
   return i18next.t(...args);

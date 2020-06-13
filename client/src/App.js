@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { formatDistance, differenceInHours, format } from 'date-fns';
-import fi from 'date-fns/locale/fi';
 import Mousetrap from 'mousetrap';
 import ReactGA from 'react-ga';
 import Lightbox from 'react-image-lightbox';
@@ -8,6 +7,7 @@ import 'react-image-lightbox/style.css';
 import { withTranslation } from 'react-i18next';
 import logo from './moose-shape.svg';
 import camera from './photo-camera.svg';
+import { dateFnsLocale } from './i18n';
 import './App.css';
 
 const gaId = process.env.REACT_APP_GOOGLE_ANALYTICS_ID;
@@ -99,17 +99,17 @@ class App extends Component {
       lightboxOpen && t('app.image_caption', {
         index: lightboxIndex + 1,
         total: lightboxImages.length,
-        date: format(ts, 'dd.MM.yyyy', { locale: fi }),
-        time: format(ts, 'HH:mm', { locale: fi }),
+        date: format(ts, 'dd.MM.yyyy', { locale: dateFnsLocale }),
+        time: format(ts, 'HH:mm', { locale: dateFnsLocale }),
         temp: lightboxImages[lightboxIndex].temperature
       });
 
     const boxes = images.map((eventImages, index) => {
       const firstEmailCreatedAt = new Date(eventImages[0].email_created_at * 1000);
       const lastEmailCreatedAt = new Date(eventImages[eventImages.length - 1].email_created_at * 1000);
-      const dateString = formatDistance(firstEmailCreatedAt, new Date(), { locale: fi });
+      const dateString = formatDistance(firstEmailCreatedAt, new Date(), { locale: dateFnsLocale });
       const timeString = format(firstEmailCreatedAt, 'HH:mm');
-      const duration = formatDistance(firstEmailCreatedAt, lastEmailCreatedAt, { locale: fi });
+      const duration = formatDistance(firstEmailCreatedAt, lastEmailCreatedAt, { locale: dateFnsLocale });
 
       const newTag =
         Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? (
@@ -118,7 +118,7 @@ class App extends Component {
 
       return (
         <div className="activity" key={eventImages.map(image => image.file_name).join()}>
-          <img src={camera} className="camera-icon" alt="[camera]" />
+          <img src={camera} className="camera-icon" alt="camera icon" />
           <span className="activity-title">
             {t('app.visit', { count: images.length - index })} {newTag}
           </span>
@@ -129,7 +129,7 @@ class App extends Component {
             {eventImages.map((image, imageIndex) => (
               <img
                 key={image.file_name}
-                alt="Camera image"
+                alt="Camera snapshot thumbnail"
                 onClick={() => this.onOpenViewer(eventImages, imageIndex)}
                 className="activity-thumbnail"
                 src={`/api/images/${image.file_name}_thumb.jpg`}
