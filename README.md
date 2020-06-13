@@ -1,5 +1,7 @@
 # Trailmate
 
+[![Build Status](https://travis-ci.org/ilkkao/trailmate.svg?branch=master)](https://travis-ci.org/ilkkao/trailmate)
+
 :bear: **Check the demo: [Live Trailmate in action](https://riistakamera.eu)**
 
 Trailmate is a simple companion web app for trail cameras that support email transport. It includes a SMTP server which the camera can directly connect to. You don't need to setup email servers, MX records or email to HTTP gateways.
