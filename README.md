@@ -45,16 +45,22 @@ services:
 
 Install node modules:
 
-`$ cd client && yarn`
-`$ cd server && yarn`
+```bash
+$ cd client && yarn
+$ cd server && yarn
+```
 
 Run client dev server in first terminal:
 
-`$ cd client && yarn start-dev`
+```bash
+$ cd client && yarn start-dev
+```
 
 Run server in second terminal:
 
-`$ cd server && yarn start-dev`
+```bash
+$ cd server && yarn start-dev
+```
 
 Access the website at http://localhost:3000/
 
