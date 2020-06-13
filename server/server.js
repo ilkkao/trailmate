@@ -1,103 +1,43 @@
-require('dotenv').config();
-
-const fs = require('fs');
 const path = require('path');
-const cron = require('cron');
+const fs = require('fs');
 const Koa = require('koa');
 const send = require('koa-send');
 const Router = require('koa-router');
 const koaBody = require('koa-body');
-const logger = require('koa-logger');
-const sharp = require('sharp');
-const Tesseract = require('tesseract.js');
-const uuid = require('uid2');
-const Database = require('better-sqlite3');
-const mailgun = require('mailgun-js');
+const koaLogger = require('koa-logger');
+const { queryStmt, deleteStmt } = require('./database');
+const emailNotificationSender = require('./email-notification-sender');
+const imageProcessor = require('./image-processor');
+const config = require('./config');
+const logger = require('./logger');
 
-const db = new Database(process.env.DB_FILE);
+emailNotificationSender.start();
 
 const GROUPING_THRESHOLD = 60 * 20; // 20 minutes
 const ONE_YEAR_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 365;
 
-const mailgunSender = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
 
-new cron.CronJob('0 0 3 * * *', sendNewImageNotification).start();
-
-db.prepare(
-  `
-  CREATE TABLE IF NOT EXISTS images (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    file_name text NOT NULL UNIQUE,
-    created_at integer,
-    email_created_at integer NOT NULL,
-    ocr_created_at integer,
-    temperature integer,
-    deleted_at integer)`
-).run();
-
-db.prepare(
-  `
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_images_email_created_at ON images (
-    email_created_at
-  )`
-).run();
-
-const insertStmt = db.prepare(`
-  INSERT INTO images (
-    file_name,
-    created_at,
-    email_created_at,
-    ocr_created_at,
-    temperature
-  ) VALUES (
-    $file_name,
-    $created_at,
-    $email_created_at,
-    $ocr_created_at,
-    $temperature
-  )`);
-
-const queryStml = db.prepare(`
-  SELECT
-    file_name, email_created_at, ocr_created_at, temperature
-  FROM
-    images
-  WHERE
-    deleted_at IS NULL
-  ORDER BY
-    email_created_at ASC`);
-
-const queryNewStml = db.prepare(`
-  SELECT
-    count(*) AS new_images
-  FROM
-    images
-  WHERE
-    datetime(email_created_at, 'unixepoch') >= datetime('now', '-24 Hour') AND deleted_at IS NULL`);
-
-const deleteStml = db.prepare(`
-  UPDATE
-    images
-  SET
-    deleted_at=$deleted_at
-  WHERE
-    file_name=$file_name`);
-
 init();
-
-process.on('exit', () => Tesseract.terminate());
 
 async function init() {
   const app = new Koa();
   const router = new Router();
 
-  if (process.env.VERBOSE === 'true') {
-    app.use(logger());
+  if (config.get('verbose')) {
+    app.use(koaLogger());
   }
 
-  router.post(`/api/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest);
-  router.post(`/upload-image-${process.env.URL_SECRET_KEY}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
+  router.post(
+    `/api/upload-image-${config.get('url_secret_key')}`,
+    koaBody({ multipart: true }),
+    imageProcessor.processNewImageRequest
+  );
+  router.post(
+    `/upload-image-${config.get('url_secret_key')}`,
+    koaBody({ multipart: true }),
+    imageProcessor.processNewImageRequest
+  ); // Legacy support
   router.get('/api/images.json', listImages);
   router.delete('/api/delete_image/:image_id/:password', deleteImage);
   router.get(/^\/camera-images\/(.*)/, serveCameraImage);
@@ -106,8 +46,9 @@ async function init() {
   app.use(router.routes());
   app.use(router.allowedMethods());
 
-  console.warn('Server starting...');
-  app.listen(process.env.SERVER_PORT);
+  const port = config.get('server_port');
+  logger.info(`Server starting, port ${port}...`);
+  app.listen(port);
 }
 
 async function serveCameraImage(ctx) {
@@ -115,7 +56,7 @@ async function serveCameraImage(ctx) {
 
   try {
     await send(ctx, imageFile, {
-      root: process.env.IMAGE_DIR,
+      root: config.get('image_dir'),
       maxAge: ONE_YEAR_IN_MILLISECONDS,
       immutable: true
     });
@@ -147,11 +88,22 @@ async function listImages({ response }) {
   response.body = imageList();
 }
 
+async function deleteImage({ response, params }) {
+  if (params.password === config.get('admin_password')) {
+    deleteStmt.run({
+      file_name: params.image_id,
+      deleted_at: Math.floor(Date.now() / 1000)
+    });
+  }
+
+  response.status = 200;
+}
+
 function imageList() {
   const images = [];
   let previousImageTs = 0;
 
-  queryStml.all().forEach(image => {
+  queryStmt.all().forEach(image => {
     const currentImageTs = image.email_created_at;
 
     if (currentImageTs - previousImageTs > GROUPING_THRESHOLD) {
@@ -164,138 +116,4 @@ function imageList() {
   });
 
   return images.reverse();
-}
-
-async function deleteImage({ response, params }) {
-  if (params.password === process.env.ADMIN_PASSWORD) {
-    deleteStml.run({
-      file_name: params.image_id,
-      deleted_at: Math.floor(Date.now() / 1000)
-    });
-  }
-
-  response.status = 200;
-}
-
-async function processNewImageRequest({ request, response }) {
-  if (request.body['attachment-count'] === '1') {
-    const date = request.body.Date;
-    const file = request.files['attachment-1'];
-
-    await processNewImage(date, file.path);
-  } else {
-    console.error('Unexpected amount of attachments in the email.');
-  }
-
-  response.status = 200;
-}
-
-async function processNewImage(dateString, filePath) {
-  const baseFileName = uuid(42);
-  const emailCreatedAtDate = new Date(dateString);
-
-  console.log('Saving the main image');
-  await saveMainImage(filePath, `${baseFileName}.jpg`);
-
-  console.log('Saving the 1x thumbnail image');
-  await saveThumbnailImage(filePath, 170, `${baseFileName}_thumb.jpg`);
-
-  console.log('Extracting the metadata region');
-  const metaDataImage = await extractMetaDataImage(filePath);
-
-  console.log('OCR reading the metadata region');
-  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
-
-  const emailCreatedAtDateInSeconds = Math.floor(emailCreatedAtDate.getTime() / 1000);
-
-  console.log('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName, ocrDate, ocrTemperature });
-
-  try {
-    insertStmt.run({
-      file_name: baseFileName,
-      email_created_at: emailCreatedAtDateInSeconds,
-      ocr_created_at: ocrDate && Math.floor(ocrDate.getTime() / 1000),
-      temperature: ocrTemperature,
-      created_at: Math.floor(Date.now() / 1000)
-    });
-
-    console.log('Image processed successfully');
-  } catch (e) {
-    console.log('Failed to add image metadata to the db, ignoring', e);
-  }
-}
-
-async function extractMetaDataImage(filePath) {
-  return sharp(filePath)
-    .extract({ left: 520, top: 932, width: 635, height: 26 })
-    .toBuffer({ resolveWithObject: true })
-    .then(({ data }) => data);
-}
-
-async function saveMainImage(filePath, fileName) {
-  return sharp(filePath)
-    .extract({ left: 0, top: 0, width: 1279, height: 928 })
-    .toFile(path.join(process.env.IMAGE_DIR, fileName));
-}
-
-async function saveThumbnailImage(filePath, width, thumbnailFileName) {
-  return sharp(filePath)
-    .extract({ left: 0, top: 0, width: 1279, height: 928 })
-    .resize(width)
-    .toFile(path.join(process.env.IMAGE_DIR, thumbnailFileName));
-}
-
-async function ocrMetaDataImage(metaDataImage) {
-  return new Promise((resolve, reject) => {
-    Tesseract.recognize(metaDataImage)
-      .catch(err => reject(err))
-      .then(({ data: { text } }) => {
-        let ocrDate = null;
-        let ocrTemperature = null;
-
-        console.log(`OCR string: ${text.replace(/\n/, '')}`);
-
-        try {
-          const [, day, month, year] = text.match(/(\d\d)\/(\d\d)\/(\d\d\d\d)/);
-          const [, hours, minutes, seconds] = text.match(/(\d\d):(\d\d):(\d\d)/);
-
-          const dateParts = [year, month, day, hours, minutes, seconds].map(part => parseInt(part));
-          dateParts[1] -= 1; // The argument monthIndex is 0-based
-
-          ocrDate = new Date(Date.UTC(...dateParts));
-          ocrDate.setHours(ocrDate.getHours() - parseInt(process.env.CAMERA_TZ_OFFSET));
-        } catch (e) {
-          console.warn('OCR date parsing failed');
-        }
-
-        try {
-          const [, temperature] = text.match(/(-?\d+)°/);
-          ocrTemperature = parseInt(temperature);
-        } catch (e) {
-          console.warn('OCR temperature parsing failed');
-        }
-
-        return resolve({ ocrDate, ocrTemperature });
-      });
-  });
-}
-
-function sendNewImageNotification() {
-  const newImageCount = queryNewStml.get().new_images;
-
-  if (newImageCount === 0) {
-    return;
-  }
-
-  const data = {
-    from: process.env.MAILGUN_FROM,
-    to: process.env.MAILGUN_FROM,
-    bcc: process.env.MAILGUN_TO,
-    subject: `${newImageCount} uutta riistakamerakuvaa`,
-    text: '\n\nUusia kuvia tallennettu viimeisen 24h aikana.\n\nKäy katsomassa osoitteessa: https://riistakamera.eu'
-  };
-
-  console.log('Sending email notification');
-
-  mailgunSender.messages().send(data);
 }

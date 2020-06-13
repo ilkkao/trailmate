@@ -1,0 +1,7 @@
+{
+  "email": {
+    "subject": "Yksi uusi riistakamerakuva",
+    "subject_plural": "{{count}} uutta riistakamerakuvaa",
+    "body": "\n\nUusia kuvia tallennettu viimeisen 24h aikana.\n\nKäy katsomassa osoitteessa: {{- url}}"
+  }
+}
