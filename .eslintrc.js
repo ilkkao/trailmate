@@ -4,11 +4,7 @@ module.exports = {
     'prettier'
   ],
   rules: {
-    'prettier/prettier': [
-      'error', {
-        singleQuote: true
-      }
-    ],
+    'prettier/prettier': ['error'],
     'no-restricted-syntax': ['off'],
     'no-use-before-define': ['error', { 'functions': false, 'classes': true }],
     'no-param-reassign': ['error', { 'props': false }],
