@@ -22,7 +22,7 @@ describe('emailNotificationSender', () => {
 
     const clock = sinon.useFakeTimers(Date.now());
 
-    emailNotificationSender.start();
+    emailNotificationSender.init();
 
     clock.tick(1000 * 60 * 60 * 24);
 

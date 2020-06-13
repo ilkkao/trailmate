@@ -7,7 +7,7 @@ const config = require('./config');
 
 let newImageCron;
 
-function start() {
+function init() {
   newImageCron = new cron.CronJob('0 0 3 * * *', send);
   newImageCron.start();
 }
@@ -36,6 +36,6 @@ function send() {
 }
 
 module.exports = {
-  start,
+  init,
   stop
 };

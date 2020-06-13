@@ -21,7 +21,8 @@ async function init() {
   const app = new Koa();
   const router = new Router();
 
-  emailNotificationSender.start();
+  i18n.init();
+  emailNotificationSender.init();
 
   if (config.get('verbose')) {
     app.use(koaLogger());
@@ -79,6 +80,7 @@ function renderIndex({ response }) {
     const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
     const vars = {
       locale: config.get('locale'),
+      translations: JSON.stringify(i18n.translations),
       google_analytics_id: config.get('google_analytics_id'),
       title: i18n.t('index.title'),
       description: i18n.t('index.description'),

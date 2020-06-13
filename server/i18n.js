@@ -1,22 +1,42 @@
 const path = require('path');
+const fs = require('fs');
 const i18next = require('i18next');
-const Backend = require('i18next-fs-backend');
 const config = require('./config');
+const logger = require('./logger');
 
-i18next.use(Backend).init({
-  initImmediate: false,
-  lowerCaseLng: true,
-  backend: {
-    loadPath: path.join(__dirname, '../client/src/locales/{{lng}}.json')
-  }
-});
+const translations = {};
 
-i18next.changeLanguage(config.test ? 'cimode' : config.get('locale'));
+function init() {
+  const langFiles = fs.readdirSync(path.join(__dirname, '../locales'));
+
+  logger.info('Loading translations...');
+
+  langFiles.forEach(langFile => {
+    const translation = JSON.parse(fs.readFileSync(path.join(__dirname, `../locales/${langFile}`), 'utf8'));
+    const [lang] = langFile.split('.');
+
+    translations[lang] = { translation };
+  });
+
+  i18next.init({
+    resources: translations,
+    lowerCaseLng: true,
+    fallbackLng: config.test ? 'cimode' : config.get('locale'),
+    lng: 'overrides',
+    interpolation: {
+      escapeValue: false
+    }
+  });
+
+  return translations;
+}
 
 function t(...args) {
   return i18next.t(...args);
 }
 
 module.exports = {
-  t
+  init,
+  t,
+  translations
 };
