@@ -6,7 +6,8 @@
   "author": "Ilkka Oksanen <iao@iki.fi>",
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "eslint server/*.js"
+    "lint": "eslint server/*.js",
+    "test": "yarn lint && cd server && yarn test"
   },
   "devDependencies": {
     "eslint": "6",
