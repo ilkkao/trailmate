@@ -28,9 +28,10 @@ function handleOnAuth(auth, session, callback) {
 
 function handleOnRcptTo(address, session, callback) {
   // Do the real authentication, to address is the password
-  if (address.address !== 'allowed@example.com') {
-    logger.error(`Received email with wrong to-field "${address.address}", expected ""`);
-    return callback(new Error('Invalid email address'));
+  const correctEmail = config.get('secret_email_address');
+  if (address.address !== correctEmail) {
+    logger.warn(`Received email with wrong to-field "${address.address}", expected "${correctEmail}"`);
+    return callback(new Error('Invalid address'));
   }
   return callback();
 }

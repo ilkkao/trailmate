@@ -25,11 +25,12 @@ services:
       - SERVER_PORT=3001
       - SERVER_URL=http://example.com
       - SMTP_SERVER_PORT=465
-      - URL_SECRET_KEY=foobar
+      - SECRET_URL_KEY=topsecret
+      - SECRET_EMAIL_ADDRESS=topsecret@example.com
       - CAMERA_TZ_OFFSET=3
       - IMAGE_DIR=/data
       - DB_FILE=/data/database.db
-      - ADMIN_PASSWORD=foobar
+      - ADMIN_PASSWORD=verysecret
       - MAILGUN_API_KEY=key-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       - MAILGUN_DOMAIN=example.com
       - MAILGUN_FROM=My camera <info@example.com>

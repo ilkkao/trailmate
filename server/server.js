@@ -31,11 +31,11 @@ async function init() {
   }
 
   router.post(
-    `/api/upload-image-${config.get('url_secret_key')}`,
+    `/api/upload-image-${config.get('secret_url_key')}`,
     koaBody({ multipart: true }),
     processNewImageRequest
   );
-  router.post(`/upload-image-${config.get('url_secret_key')}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
+  router.post(`/upload-image-${config.get('secret_url_key')}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
 
   router.get('/api/images.json', listImages);
   router.get('/api/images/:image_file_name', serveCameraImage);
