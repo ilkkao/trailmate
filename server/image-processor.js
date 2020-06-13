@@ -6,19 +6,6 @@ const logger = require('./logger');
 const { insertStmt } = require('./database');
 const config = require('./config');
 
-async function processNewImageRequest({ request, response }) {
-  if (request.body['attachment-count'] === '1') {
-    const date = request.body.Date;
-    const file = request.files['attachment-1'];
-
-    await processNewImage(date, file.path);
-  } else {
-    logger.error('Unexpected amount of attachments in the email.');
-  }
-
-  response.status = 200;
-}
-
 async function processNewImage(dateString, filePath) {
   const baseFileName = uuid(42);
   const emailCreatedAtDate = new Date(dateString);
@@ -110,5 +97,5 @@ async function ocrMetaDataImage(metaDataImage) {
 }
 
 module.exports = {
-  processNewImageRequest
+  processNewImage
 };

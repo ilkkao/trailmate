@@ -24,6 +24,7 @@ services:
       - LOCALE=en-us
       - SERVER_PORT=3001
       - SERVER_URL=http://example.com
+      - SMTP_SERVER_PORT=465
       - URL_SECRET_KEY=foobar
       - CAMERA_TZ_OFFSET=3
       - IMAGE_DIR=/data

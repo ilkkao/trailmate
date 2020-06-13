@@ -29,7 +29,7 @@ function send() {
     to: config.get('mailgun_from'),
     bcc: config.get('mailgun_to'),
     subject: t('email.subject', { count: newImageCount }),
-    text: t('email.body', { url: config.get('server_url') })
+    text: t('email.body', { url: config.get('http_server_url') })
   });
 
   info('Sent email notification');

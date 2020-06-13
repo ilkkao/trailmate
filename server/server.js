@@ -8,6 +8,7 @@ const koaLogger = require('koa-logger');
 const { queryStmt, deleteStmt } = require('./database');
 const emailNotificationSender = require('./email-notification-sender');
 const imageProcessor = require('./image-processor');
+const smtpServer = require('./smtp-server');
 const config = require('./config');
 const logger = require('./logger');
 const i18n = require('./i18n');
@@ -23,6 +24,7 @@ async function init() {
 
   i18n.init();
   emailNotificationSender.init();
+  smtpServer.init();
 
   if (config.get('verbose')) {
     app.use(koaLogger());
@@ -31,17 +33,13 @@ async function init() {
   router.post(
     `/api/upload-image-${config.get('url_secret_key')}`,
     koaBody({ multipart: true }),
-    imageProcessor.processNewImageRequest
+    processNewImageRequest
   );
-  router.post(
-    `/upload-image-${config.get('url_secret_key')}`,
-    koaBody({ multipart: true }),
-    imageProcessor.processNewImageRequest
-  ); // Legacy support
+  router.post(`/upload-image-${config.get('url_secret_key')}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
 
   router.get('/api/images.json', listImages);
-  router.delete('/api/images/:image_id/:password', deleteImage);
   router.get('/api/images/:image_file_name', serveCameraImage);
+  router.delete('/api/images/:image_id/:password', deleteImage);
 
   router.get(/\/(index.html)?\/*$/, renderIndex);
   router.get(/(.*)/, renderAsset);
@@ -49,9 +47,9 @@ async function init() {
   app.use(router.routes());
   app.use(router.allowedMethods());
 
-  const port = config.get('server_port');
+  const port = config.get('http_server_port');
   app.listen(port, () => {
-    logger.info(`Server started, port: ${port}`);
+    logger.info(`HTTP server started, port: ${port}`);
   });
 }
 
@@ -104,6 +102,18 @@ async function deleteImage({ response, params }) {
       file_name: params.image_id,
       deleted_at: Math.floor(Date.now() / 1000)
     });
+  }
+
+  response.status = 200;
+}
+
+async function processNewImageRequest({ request, response }) {
+  if (request.body['attachment-count'] === '1') {
+    const date = request.body.Date;
+    const file = request.files['attachment-1'];
+    await imageProcessor.processNewImage(date, file.path);
+  } else {
+    logger.error('Unexpected amount of attachments in the email.');
   }
 
   response.status = 200;

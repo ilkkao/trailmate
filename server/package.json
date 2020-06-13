@@ -1,5 +1,5 @@
 {
-  "name": "trailmate",
+  "name": "server",
   "version": "0.1.0",
   "description": "Trail cam website",
   "repository": "https://github.com/ilkkao/trailmate",
@@ -19,6 +19,7 @@
     "koa-router": "^9.0.1",
     "koa-send": "^5.0.0",
     "mailgun-js": "^0.22.0",
+    "mailparser": "^2.7.7",
     "sharp": "^0.25.3",
     "smtp-server": "^3.6.0",
     "tesseract.js": "^2.1.1",
