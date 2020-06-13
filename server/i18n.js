@@ -11,7 +11,7 @@ i18next.use(Backend).init({
   }
 });
 
-i18next.changeLanguage(config.test ? 'cimode' : config.get('server_locale'));
+i18next.changeLanguage(config.test ? 'cimode' : config.get('locale'));
 
 function t(...args) {
   return i18next.t(...args);

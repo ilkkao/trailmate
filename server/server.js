@@ -78,11 +78,12 @@ function renderIndex({ response }) {
   try {
     const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
     const vars = {
-      locale: config.get('react_app_locale'),
+      locale: config.get('locale'),
+      google_analytics_id: config.get('google_analytics_id'),
       title: i18n.t('index.title'),
       description: i18n.t('index.description'),
       no_js_warning: i18n.t('index.no_js_warning'),
-      js_init: `preloadedImages = ${JSON.stringify(imageList(), null, 2)};`
+      preloaded_images: JSON.stringify(imageList(), null, 2)
     };
 
     response.body = indexPage.replace(/__([A-Z_]+)__/g, (_, name) => vars[name.toLowerCase()]);

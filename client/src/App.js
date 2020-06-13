@@ -10,10 +10,8 @@ import camera from './photo-camera.svg';
 import { dateFnsLocale } from './i18n';
 import './App.css';
 
-const gaId = process.env.REACT_APP_GOOGLE_ANALYTICS_ID;
-
-if (gaId) {
-  ReactGA.initialize(gaId);
+if (window.config.googleAnalyticsId) {
+  ReactGA.initialize(window.config.googleAnalyticsId);
   ReactGA.pageview(window.location.pathname + window.location.search); // TODO: Make more granular.
 }
 
@@ -29,14 +27,14 @@ class App extends Component {
     this.updateImages = this.updateImages.bind(this);
 
     this.state = {
-      images: window.preloadedImages || [],
+      images: window.config.preloadedImages || [],
       lightboxImages: [],
       lightboxCaption: '',
       lightboxIndex: 0,
       lightboxOpen: false
     };
 
-    if (!window.preloadedImages) {
+    if (!window.config.preloadedImages) {
       this.updateImages();
     }
 

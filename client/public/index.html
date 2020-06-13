@@ -16,8 +16,18 @@
 
   <script>
     try {
-      __JS_INIT__
-    } catch (e) { }
+      window.config = {
+        locale: "__LOCALE__",
+        googleAnalyticsId: "__GOOGLE_ANALYTICS_ID__",
+        preloadedImages: __PRELOADED_IMAGES__
+      };
+    } catch (e) {
+      window.config = {
+        locale: 'en-us',
+        googleAnalyticsId: null,
+        preloadedImages: []
+      }
+    }
   </script>
 </head>
 

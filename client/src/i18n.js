@@ -17,7 +17,7 @@ const resources = {
   'en-us': { translation: enUs }
 };
 
-export const locale = process.env.REACT_APP_LOCALE;
+export const locale = window.config.locale;
 
 export const dateFnsLocale = dateFnsLocales[locale];
 
