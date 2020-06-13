@@ -2,3 +2,6 @@ language: node_js
 node_js:
   - "14"
 sudo: false
+before_script:
+  - cd client && yarn
+  - cd ../server && yarn
