@@ -3,11 +3,9 @@ const fs = require('fs');
 const Koa = require('koa');
 const send = require('koa-send');
 const Router = require('koa-router');
-const koaBody = require('koa-body');
 const koaLogger = require('koa-logger');
 const { queryStmt, deleteStmt } = require('./database');
 const emailNotificationSender = require('./email-notification-sender');
-const imageProcessor = require('./image-processor');
 const smtpServer = require('./smtp-server');
 const config = require('./config');
 const logger = require('./logger');
@@ -29,13 +27,6 @@ async function init() {
   if (config.get('verbose')) {
     app.use(koaLogger());
   }
-
-  router.post(
-    `/api/upload-image-${config.get('secret_url_key')}`,
-    koaBody({ multipart: true }),
-    processNewImageRequest
-  );
-  router.post(`/upload-image-${config.get('secret_url_key')}`, koaBody({ multipart: true }), processNewImageRequest); // Legacy support
 
   router.get('/api/images.json', listImages);
   router.get('/api/images/:image_file_name', serveCameraImage);
