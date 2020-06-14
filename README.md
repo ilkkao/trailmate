@@ -20,6 +20,7 @@ services:
       - trailmate-data:/data
     ports:
       - "80:3001"
+      - "2526:2526"
     environment:
       - HTTP_SERVER_URL=http://example.com
       - SECRET_EMAIL_ADDRESS=topsecret@example.com
@@ -31,7 +32,7 @@ volumes:
   trailmate-data:
 ```
 
-### Configuration
+### Application configuration
 
 | Environment variable | Type | Default value | Description |
 | -------------------- | ---- | ------------- | ----------- |
@@ -51,7 +52,23 @@ volumes:
 | GOOGLE_ANALYTICS_ID | Optional | -not set- | Google Analytics ID. Has the form `UA-111111111-1` |
 | VERBOSE | Optional | false | Log web server requests to stdout. |
 
-## Develpment
+### Trail camera configuration
+
+In your camera settings, enable email sending and use the following setting values:
+
+| Setting            | Correct value |
+| ------------------ | ------------- |
+| SMTP server        | Your web server public host name or IP address. For example `myowntrailcam.com` |
+| SMTP port          | The port you configured with `SMTP_SERVER_PORT` environment variable or the default `2526` |
+| Use SSL            | Can be set to enabled or disabled. Trailmate supports both. |
+| Use authentication | Can be set to enabled or disabled. Trailmate is flexible |
+| Username           | Can be anything. Trailmate accepts any value |
+| Password           | Can be anything. Trailmate accepts any value |
+| To address         | Must match to `SECRET_EMAIL_ADDRESS` you configured. Note that for trailmate this is just a string and shuold not be a real existing email address. Good example would be `kdfjas83m@fdsk3nbs.fjshdajhf`. |
+
+See trailmate logs in case of any SMTP issues.
+
+## Development
 
 ### Run locally in dev mode
 
