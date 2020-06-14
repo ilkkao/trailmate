@@ -41,13 +41,6 @@ async function processNewImage(dateString, filePath) {
   }
 }
 
-async function extractMetaDataImage(filePath) {
-  return sharp(filePath)
-    .extract({ left: 520, top: 932, width: 635, height: 26 })
-    .toBuffer({ resolveWithObject: true })
-    .then(({ data }) => data);
-}
-
 async function saveMainImage(filePath, fileName) {
   return sharp(filePath)
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
@@ -59,6 +52,13 @@ async function saveThumbnailImage(filePath, width, thumbnailFileName) {
     .extract({ left: 0, top: 0, width: 1279, height: 928 })
     .resize(width)
     .toFile(path.join(config.get('image_dir'), thumbnailFileName));
+}
+
+async function extractMetaDataImage(filePath) {
+  return sharp(filePath)
+    .extract({ left: 520, top: 932, width: 635, height: 26 })
+    .toBuffer({ resolveWithObject: true })
+    .then(({ data }) => data);
 }
 
 async function ocrMetaDataImage(metaDataImage) {

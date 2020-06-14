@@ -20,6 +20,7 @@ async function init() {
   const app = new Koa();
   const router = new Router();
 
+  config.init();
   i18n.init();
   emailNotificationSender.init();
   smtpServer.init();
@@ -68,9 +69,9 @@ function renderIndex({ response }) {
   try {
     const indexPage = fs.readFileSync(path.join(__dirname, '../client/build/index.html'), 'utf8');
     const vars = {
-      locale: config.get('locale'),
+      locale: JSON.stringify(config.get('locale')),
       translations: JSON.stringify(i18n.translations),
-      google_analytics_id: config.get('google_analytics_id'),
+      google_analytics_id: JSON.stringify(config.get('google_analytics_id')),
       title: i18n.t('index.title'),
       description: i18n.t('index.description'),
       no_js_warning: i18n.t('index.no_js_warning'),
@@ -93,18 +94,6 @@ async function deleteImage({ response, params }) {
       file_name: params.image_id,
       deleted_at: Math.floor(Date.now() / 1000)
     });
-  }
-
-  response.status = 200;
-}
-
-async function processNewImageRequest({ request, response }) {
-  if (request.body['attachment-count'] === '1') {
-    const date = request.body.Date;
-    const file = request.files['attachment-1'];
-    await imageProcessor.processNewImage(date, file.path);
-  } else {
-    logger.error('Unexpected amount of attachments in the email.');
   }
 
   response.status = 200;

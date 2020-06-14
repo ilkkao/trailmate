@@ -8,6 +8,8 @@ const config = require('./config');
 let newImageCron;
 
 function init() {
+  mailgun.init();
+
   newImageCron = new cron.CronJob('0 0 3 * * *', send);
   newImageCron.start();
 }
@@ -25,9 +27,6 @@ function send() {
   }
 
   mailgun.sendEmail({
-    from: config.get('mailgun_from'),
-    to: config.get('mailgun_from'),
-    bcc: config.get('mailgun_to'),
     subject: t('email.subject', { count: newImageCount }),
     text: t('email.body', { url: config.get('http_server_url') })
   });

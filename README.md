@@ -10,34 +10,46 @@ Trailmate is a simple companion web app for trail cameras that support email tra
 
 Recommended way to run Trailmate is with docker. Example `docker-compose.yml` file:
 
-```
+```yml
 version: '3'
 services:
   trailmate:
     image: ilkkao/trailmate:latest
     restart: unless-stopped
     volumes:
-      - ./data/:/data
+      - trailmate-data:/data
     ports:
-      - "3001:3001"
+      - "80:3001"
     environment:
-      - LOCALE=en-us
-      - SERVER_PORT=3001
-      - SERVER_URL=http://example.com
-      - SMTP_SERVER_PORT=465
-      - SECRET_URL_KEY=topsecret
+      - HTTP_SERVER_URL=http://example.com
       - SECRET_EMAIL_ADDRESS=topsecret@example.com
       - CAMERA_TZ_OFFSET=3
-      - IMAGE_DIR=/data
+      - IMAGE_DIR=/data/images
       - DB_FILE=/data/database.db
       - ADMIN_PASSWORD=verysecret
-      - MAILGUN_API_KEY=key-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-      - MAILGUN_DOMAIN=example.com
-      - MAILGUN_FROM=My camera <info@example.com>
-      - MAILGUN_TO=user@examle.com,user2@example.com
-      - GOOGLE_ANALYTICS_ID=UA-111111111-1
-      - VERBOSE=false
+volumes:
+  trailmate-data:
 ```
+
+### Configuration
+
+| Environment variable | Type | Default value | Description |
+| -------------------- | ---- | ------------- | ----------- |
+| HTTP_SERVER_URL | Mandatory | - | Public URL of the web site. For example `http://myowntrailcam.com`. |
+| SECRET_EMAIL_ADDRESS | Mandatory | - | The to: email address the trailcam has to use. This acts as a password. |
+| CAMERA_TZ_OFFSET | Mandatory | - | Timezone the camera is configured to use. |
+| IMAGE_DIR | Mandatory | - | Persisten directory for received images. |
+| DB_FILE | Mandatory | - | Location for the SQLite database file. |
+| ADMIN_PASSWORD | Mandatory | - | Admin password, currently needed for image deletion via the web page. |
+| LOCALE | Optional | en-us | Default user interface language. |
+| HTTP_SERVER_PORT | Optional | 3001 | Port for the nodejs web server. |
+| SMTP_SERVER_PORT | Optional | 2526 | SMTP port for incoming mails. Default 2526 is selected so that it is unlikely blocked by ISPs. |
+| MAILGUN_API_KEY | Optional | -not set- | Mailgun API key notification emails. Has the form `key-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` |
+| MAILGUN_DOMAIN | Optional | -not set- | Mailgun API domain. |
+| MAILGUN_FROM | Optional | -not set- | From: header used in notification emails. For example `My camera <info@example.com>` |
+| MAILGUN_TO | Optional | -not set- | Comma separated list of email addresses that receive the notifications. For example `addruser@examle.com,user2@example.com` |
+| GOOGLE_ANALYTICS_ID | Optional | -not set- | Google Analytics ID. Has the form `UA-111111111-1` |
+| VERBOSE | Optional | false | Log web server requests to stdout. |
 
 ## Develpment
 
