@@ -36,7 +36,7 @@ volumes:
 | Environment variable | Type | Default value | Description |
 | -------------------- | ---- | ------------- | ----------- |
 | HTTP_SERVER_URL | Mandatory | - | Public URL of the web site. For example `http://myowntrailcam.com`. |
-| SECRET_EMAIL_ADDRESS | Mandatory | - | The to: email address the trailcam has to use. This acts as a password. |
+| SECRET_EMAIL_ADDRESS | Mandatory | - | The to: email address the trail camera has to use. This acts as a password. |
 | CAMERA_TZ_OFFSET | Mandatory | - | Timezone the camera is configured to use. |
 | IMAGE_DIR | Mandatory | - | Persisten directory for received images. |
 | DB_FILE | Mandatory | - | Location for the SQLite database file. |
