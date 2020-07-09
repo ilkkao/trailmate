@@ -111,7 +111,7 @@ class App extends Component {
 
       const newTag =
         Math.abs(differenceInHours(new Date(), firstEmailCreatedAt)) < 24 ? (
-          <span className="activity-new">${t('app.new_label')}</span>
+          <span className="activity-new">{t('app.new_label')}</span>
         ) : null;
 
       return (
