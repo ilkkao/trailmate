@@ -15,6 +15,8 @@ if (window.config.googleAnalyticsId) {
   ReactGA.pageview(window.location.pathname + window.location.search); // TODO: Make more granular.
 }
 
+let savedPassword;
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -43,7 +45,7 @@ class App extends Component {
         return;
       }
 
-      const password = window.prompt(props.t('app.delete_image_password_request'));
+      const password = savedPassword ?? window.prompt(props.t('app.delete_image_password_request'));
       this.onDeleteImage(this.state.lightboxImages[this.state.lightboxIndex].file_name, password);
     });
 
@@ -58,7 +60,12 @@ class App extends Component {
   }
 
   async onDeleteImage(imageId, password) {
-    await fetch(`/api/images/${imageId}/${password}`, { method: 'DELETE' });
+    const response = await fetch(`/api/images/${imageId}/${password}`, { method: 'DELETE' });
+
+    if (response.ok) {
+      savedPassword = password;
+    }
+
     this.updateImages();
     this.onCloseViewer();
   }
