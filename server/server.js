@@ -4,10 +4,14 @@ const Koa = require('koa');
 const send = require('koa-send');
 const Router = require('koa-router');
 const koaLogger = require('koa-logger');
+
+const config = require('./config');
+
+config.init();
+
 const { queryStmt, deleteStmt } = require('./database');
 const emailNotificationSender = require('./email-notification-sender');
 const smtpServer = require('./smtp-server');
-const config = require('./config');
 const logger = require('./logger');
 const i18n = require('./i18n');
 
@@ -20,7 +24,6 @@ async function init() {
   const app = new Koa();
   const router = new Router();
 
-  config.init();
   i18n.init();
   emailNotificationSender.init();
   smtpServer.init();
