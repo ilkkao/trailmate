@@ -1,4 +1,4 @@
-FROM node:14-alpine3.12
+FROM node:14.19.3-alpine3.15
 RUN apk add --no-cache sqlite python3 build-base
 
 WORKDIR /app/server/
@@ -11,7 +11,7 @@ RUN yarn install
 COPY client /app/client
 RUN yarn build
 
-FROM node:14-alpine3.12
+FROM node:14.19.3-alpine3.15
 RUN apk add --no-cache dumb-init sqlite
 WORKDIR /app/server/
 

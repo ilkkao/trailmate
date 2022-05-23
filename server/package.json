@@ -10,18 +10,18 @@
     "test": "NODE_ENV=test env-cmd -f ../.env mocha --recursive"
   },
   "dependencies": {
-    "better-sqlite3": "^7.0.1",
+    "better-sqlite3": "^7.5.3",
     "cron": "^1.8.2",
     "i18next": "^19.5.5",
-    "koa": "^2.13.0",
+    "koa": "^2.13.4",
     "koa-logger": "^3.2.1",
     "koa-router": "^9.1.0",
     "koa-send": "^5.0.1",
     "mailgun-js": "^0.22.0",
     "mailparser": "^2.7.7",
-    "sharp": "^0.25.3",
-    "smtp-server": "^3.7.0",
-    "tesseract.js": "^2.1.1",
+    "sharp": "^0.30.5",
+    "smtp-server": "^3.11.0",
+    "tesseract.js": "^2.1.5",
     "uid2": "^0.0.3"
   },
   "devDependencies": {
