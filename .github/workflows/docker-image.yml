@@ -18,4 +18,4 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag ilkkao/trailmate:$(date +%s) --tag ilkkao/trailmate:latest
     - name: Docker Push
-      run: docker push ilkkao/trailmate
+      run: docker push --all-tags ilkkao/trailmate
