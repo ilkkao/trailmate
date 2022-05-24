@@ -435,12 +435,12 @@ core-util-is@~1.0.0:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
-cron@^1.8.2:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.2.tgz#4ac5e3c55ba8c163d84f3407bde94632da8370ce"
-  integrity sha512-Gk2c4y6xKEO8FSAUTklqtfSr7oTq0CiPQeLBG5Fl0qoXpZyMcj1SG59YL+hqq04bu6/IuEA7lMkYDAplQNKkyg==
+cron@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-2.0.0.tgz#15c6bf37c1cebf6da1d7a688b9ba1c68338bfe6b"
+  integrity sha512-RPeRunBCFr/WEo7WLp8Jnm45F/ziGJiHVvVQEBSDTSGu6uHW49b2FOP2O14DcXlGJRLhwE7TIoDzHHK4KmlL6g==
   dependencies:
-    moment-timezone "^0.5.x"
+    luxon "^1.23.x"
 
 cross-spawn@^7.0.0:
   version "7.0.3"
@@ -1315,6 +1315,11 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+luxon@^1.23.x:
+  version "1.28.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.28.0.tgz#e7f96daad3938c06a62de0fb027115d251251fbf"
+  integrity sha512-TfTiyvZhwBYM/7QdAVDh+7dBTBA29v4ik0Ce9zda3Mnf8on1S5KJI8P2jKFZ8+5C0jhmr0KwJEO/Wdpm0VeWJQ==
+
 mailgun-js@^0.22.0:
   version "0.22.0"
   resolved "https://registry.yarnpkg.com/mailgun-js/-/mailgun-js-0.22.0.tgz#128942b5e47a364a470791608852bf68c96b3a05"
@@ -1439,18 +1444,6 @@ mocha@^10.0.0:
     yargs "16.2.0"
     yargs-parser "20.2.4"
     yargs-unparser "2.0.0"
-
-moment-timezone@^0.5.x:
-  version "0.5.31"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.31.tgz#9c40d8c5026f0c7ab46eda3d63e49c155148de05"
-  integrity sha512-+GgHNg8xRhMXfEbv81iDtrVeTcWt0kWmTEY1XQK14dICTXnWJnT0dxdlPspwqF3keKMVPXwayEsk1DI0AA/jdA==
-  dependencies:
-    moment ">= 2.9.0"
-
-"moment@>= 2.9.0":
-  version "2.26.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.26.0.tgz#5e1f82c6bafca6e83e808b30c8705eed0dcbd39a"
-  integrity sha512-oIixUO+OamkUkwjhAVE18rAMfRJNsNe/Stid/gwHSOfHrOtw9EhAY2AHvdKZ/k/MggcYELFCJz/Sn2pL8b8JMw==
 
 ms@2.0.0:
   version "2.0.0"
