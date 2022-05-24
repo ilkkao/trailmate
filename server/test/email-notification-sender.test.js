@@ -35,9 +35,6 @@ describe('emailNotificationSender', () => {
     clock.tick(1000 * 60 * 10); // 10 minutes
 
     expect(mailgun.sendEmail).to.have.been.calledWith({
-      from: process.env.MAILGUN_FROM,
-      to: process.env.MAILGUN_FROM,
-      bcc: process.env.MAILGUN_TO,
       subject: 'email.subject',
       text: 'email.body'
     });
