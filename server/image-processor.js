@@ -8,7 +8,12 @@ const config = require('./config');
 
 async function processNewImage(dateString, filePath) {
   const baseFileName = uuid(42);
-  const emailCreatedAtDate = new Date(dateString);
+
+  if (!dateString) {
+    logger.warn('Date string missing')
+  }
+
+  const emailCreatedAtDate = dateString ? new Date(dateString) : new Date();
 
   logger.info('Saving the main image');
   await saveMainImage(filePath, `${baseFileName}.jpg`);
