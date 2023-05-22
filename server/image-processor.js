@@ -22,21 +22,21 @@ async function processNewImage(dateString, filePath) {
   await saveThumbnailImage(filePath, 170, `${baseFileName}_thumb.jpg`);
 
   logger.info('Extracting the metadata region');
-  const metaDataImage = await extractMetaDataImage(filePath);
+  //const metaDataImage = await extractMetaDataImage(filePath);
 
   logger.info('OCR reading the metadata region');
-  const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
+  //const { ocrDate, ocrTemperature } = await ocrMetaDataImage(metaDataImage);
 
   const emailCreatedAtDateInSeconds = Math.floor(emailCreatedAtDate.getTime() / 1000);
 
-  logger.info('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName, ocrDate, ocrTemperature });
+  //logger.info('Creating a database entry', { emailCreatedAtDateInSeconds, baseFileName, ocrDate, ocrTemperature });
 
   try {
     insertStmt.run({
       file_name: baseFileName,
       email_created_at: emailCreatedAtDateInSeconds,
-      ocr_created_at: ocrDate && Math.floor(ocrDate.getTime() / 1000),
-      temperature: ocrTemperature,
+      ocr_created_at: undefined,
+      temperature: 0,
       created_at: Math.floor(Date.now() / 1000)
     });
 
